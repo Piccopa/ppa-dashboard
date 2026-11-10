@@ -6,12 +6,12 @@
 
 :root {
   --bg: #4f6c8f;          /* latar belakang halaman */
-  --panel: #600c45;       /* latar kotak/panel */
+  --panel: #3d66c0;       /* latar kotak/panel */
   --panel-2: #0f2236;     /* latar kartu di dalam panel */
   --border: #1b3550;      /* warna garis tepi */
   --text: #e6eef7;        /* warna teks utama */
-  --muted: #8ea3b9;       /* warna teks keterangan */
-  --accent: #140562;      /* warna judul (cyan) */
+  --muted: #131414;       /* warna teks keterangan */
+  --accent: #f5d7ef;      /* warna judul (cyan) */
   --brand: #c8913f;       /* warna emas logo MITMAG */
   --green: #22c55e;
   --red: #dc2626;
