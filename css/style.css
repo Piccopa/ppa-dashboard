@@ -11,7 +11,7 @@
   --border: #1b3550;      /* warna garis tepi */
   --text: #e6eef7;        /* warna teks utama */
   --muted: #8ea3b9;       /* warna teks keterangan */
-  --accent: #22d3ee;      /* warna judul (cyan) */
+  --accent: #ee2222;      /* warna judul (cyan) */
   --brand: #c8913f;       /* warna emas logo MITMAG */
   --green: #22c55e;
   --red: #dc2626;
@@ -56,7 +56,7 @@ button { font-family: inherit; cursor: pointer; }
 .header-row + .header-row { margin-top: 10px; }
 .brand { display: flex; align-items: center; gap: 12px; min-width: 330px; }
 .brand-logo {
-  height: 46px; padding: 4px 8px; border-radius: 8px;
+  height: 72px; padding: 4px 8px; border-radius: 8px;
   background: #fffaf2;     /* kotak terang agar logo emas terlihat jelas */
 }
 .brand-title { color: var(--accent); font-weight: 800; font-size: 17px; line-height: 1.2; letter-spacing: .2px; }
