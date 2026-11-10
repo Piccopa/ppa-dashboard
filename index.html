@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <!-- ===== BAGIAN HEAD: pengaturan halaman (tidak terlihat di layar) ===== -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MITMAG SMART MONITORING SYSTEM</title>
+  <link rel="icon" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===================== HEADER (bagian atas) ===================== -->
+  <header class="app-header">
+    <div class="header-row">
+      <div class="brand">
+        <img class="brand-logo" src="assets/logo.png" alt="Logo MITMAG">
+        <div>
+          <div class="brand-title" id="brandTitle">MITMAG SMART MONITORING SYSTEM</div>
+          <div class="brand-sub" id="brandSub">Digital Twin Smart Manufacture 4.0 · Provide by PT MITMAG</div>
+        </div>
+      </div>
+      <!-- Tombol-tombol modul. data-module = nama modul yang dibuka -->
+      <nav class="module-tabs" id="moduleTabs">
+        <button class="chip active" data-module="manufacture">🏭 Smart Manufacture</button>
+        <button class="chip" data-module="tower">🏢 Smart Tower</button>
+        <button class="chip" data-module="twin3d">🧊 3D Digital Twin</button>
+        <button class="chip" data-module="tower3d">🌃 3D Smart Tower</button>
+        <button class="chip" data-module="palm3d">🌴 Grow Palm 3D</button>
+        <button class="chip" data-module="power3d">⚡ Power Plant 3D</button>
+        <button class="chip" data-module="water3d">💧 Water Treatment 3D</button>
+      </nav>
+    </div>
+    <div class="header-row">
+      <button class="chip" data-module="solar3d">🌞 Solar Plant 3D</button>
+      <input class="search" id="search" placeholder="Cari peralatan, lokasi, data…">
+      <button class="chip" id="btnIntegrasi">📍 Integrasi: Simulasi</button>
+      <button class="chip" id="btnTheme">🌙 Gelap / 🌞 Terang</button>
+      <button class="chip" id="btnFull">⛶ Layar Penuh</button>
+      <span class="chip"><span class="dot"></span> Realtime</span>
+      <span class="chip"><span class="dot"></span> Online</span>
+      <span class="chip">🧠 AI Aktif</span>
+      <div class="clock">
+        <div class="date" id="clockDate">-</div>
+        <div class="time" id="clockTime">--:--:--</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== ISI HALAMAN ===================== -->
+  <div class="layout">
+    <!-- Menu samping (hanya untuk Smart Manufacture) -->
+    <aside class="sidebar" id="sidebar">
+      <a href="#ringkasan" class="active">🏠 Ringkasan</a>
+      <a href="#digital-twin">🧊 Digital Twin</a>
+      <a href="#kontrol">⚙️ Kontrol Peralatan</a>
+      <a href="#realtime">⚡ Real-Time</a>
+      <a href="#cctv">📹 CCTV</a>
+      <a href="#akses">🔒 Akses Kontrol</a>
+      <a href="#fire">🔥 Fire Alarm</a>
+      <a href="#ai">🧠 AI Analisis</a>
+      <a href="#oee">📈 OEE</a>
+      <a href="#tren">📊 Tren</a>
+      <a href="#logger">🗄️ Data Logger</a>
+      <a href="#esg">🌿 ESG</a>
+    </aside>
+
+    <main class="content">
+      <!-- Setiap <section class="module"> adalah satu modul. Isinya dibuat oleh JavaScript (js/app.js) -->
+      <section class="module active" id="mod-manufacture"></section>
+      <section class="module" id="mod-tower"></section>
+      <section class="module" id="mod-twin3d"></section>
+      <section class="module" id="mod-tower3d"></section>
+      <section class="module" id="mod-palm3d"></section>
+      <section class="module" id="mod-power3d"></section>
+      <section class="module" id="mod-water3d"></section>
+      <section class="module" id="mod-solar3d"></section>
+    </main>
+  </div>
+
+  <!-- ===================== FOOTER (bagian bawah) ===================== -->
+  <footer class="footer" id="footer"></footer>
+  <div class="toast" id="toast"></div>
+
+  <!-- ===================== JAVASCRIPT ===================== -->
+  <!-- Three.js = pustaka untuk gambar 3D -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/tower.js"></script>
+  <script src="js/scenes3d.js"></script>
+</body>
+</html>
