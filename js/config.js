@@ -7,15 +7,15 @@
 const CONFIG = {
   // ---- Identitas perusahaan ----
   namaSistem: "MITMAG SMART MONITORING SYSTEM",
-  subJudul: "Digital Twin Smart Manufacture 4.0 · Provide by PT PICCO PRIMA ARTHA",
-  namaPerusahaan: "PT PICCO PRIMA ARTHA",
+  subJudul: "Digital Twin Smart Manufacture 4.0 · Provide by PT MITMAG",
+  namaPerusahaan: "PT MITMAG",
   namaSingkat: "MITMAG",
 
   // ---- Kontak di footer (GANTI dengan data asli Anda) ----
   telepon: "+62 000-0000-0000",
-  email: "sales@piccopa.co.id",
-  website: "www.piccopa.co.id",
-  namaPembuat: "PT PICCO PRIMA ARTHA",
+  email: "email@perusahaan-anda.com",
+  website: "www.website-anda.com",
+  namaPembuat: "Nama Anda",
 };
 
 /* ---- Daftar peralatan di "Kontrol Peralatan" ----
@@ -58,11 +58,11 @@ const SENSOR = [
 /* ---- Pintu akses kontrol & karyawan ---- */
 const PINTU = ["Pintu Utama", "Pintu Kantor 1", "Lantai Pabrik", "Gudang", "Ruang Server"];
 const KARYAWAN = [
-  { nama: "Wahyu", id: "EMP-001" },
-  { nama: "Ika Erlia", id: "EMP-014" },
-  { nama: "Demak Parulian", id: "EMP-027" },
-  { nama: "Dea", id: "EMP-033" },
-  { nama: "Winda", id: "EMP-041" },
+  { nama: "Budi Santoso", id: "EMP-001" },
+  { nama: "Sari Wulandari", id: "EMP-014" },
+  { nama: "Dimas Pratama", id: "EMP-027" },
+  { nama: "Rina Anggraini", id: "EMP-033" },
+  { nama: "Agus Hidayat", id: "EMP-041" },
 ];
 
 /* ---- Zona fire alarm ---- */
@@ -73,14 +73,14 @@ const KAMERA = ["Lantai Pabrik 1", "Lantai Pabrik 2", "Upper Mezzanine", "Ruang 
 
 /* ---- Tenant gedung (modul Smart Tower) ---- */
 const TENANT = [
-  { kode: "T-01", lantai: "Lt.2", nama: "PT Habonaron do Bona", bidang: "F&B", luas: 120 },
-  { kode: "T-02", lantai: "Lt.3", nama: "CV Cahaya Sumatera", bidang: "Konsultan", luas: 90 },
-  { kode: "T-03", lantai: "Lt.4", nama: "PT Abi Tonoy Pengangkutan", bidang: "Logistik", luas: 150 },
-  { kode: "T-04", lantai: "Lt.5", nama: "PT Aisoise", bidang: "Logistik", luas: 180 },
-  { kode: "T-05", lantai: "Lt.6", nama: "Hidden Kitchen", bidang: "Restaurants", luas: 110 },
+  { kode: "T-01", lantai: "Lt.2", nama: "PT Samudra Boga", bidang: "F&B", luas: 120 },
+  { kode: "T-02", lantai: "Lt.3", nama: "CV Cakra Konsultan", bidang: "Konsultan", luas: 90 },
+  { kode: "T-03", lantai: "Lt.4", nama: "PT Nusa Teknologi", bidang: "IT", luas: 150 },
+  { kode: "T-04", lantai: "Lt.5", nama: "PT Bahari Logistik", bidang: "Logistik", luas: 180 },
+  { kode: "T-05", lantai: "Lt.6", nama: "PT Citra Farma", bidang: "Farmasi", luas: 110 },
   { kode: "T-06", lantai: "Lt.7", nama: "Kantor Hukum Pratama", bidang: "Hukum", luas: 85 },
-  { kode: "T-07", lantai: "Lt.8", nama: "PT Damai Collection", bidang: "Klinik", luas: 200 },
-  { kode: "T-08", lantai: "Lt.9", nama: "Hana Amarissa Thrift", bidang: "Digital", luas: 160 },
-  { kode: "T-09", lantai: "Lt.10", nama: "CV Demak Tua", bidang: "Kreatif", luas: 95 },
-  { kode: "T-10", lantai: "Lt.11", nama: "PT IEPS Semesta Fikki", bidang: "Energi", luas: 220 },
+  { kode: "T-07", lantai: "Lt.8", nama: "PT Medika Prima", bidang: "Klinik", luas: 200 },
+  { kode: "T-08", lantai: "Lt.9", nama: "PT Garuda Digital", bidang: "Digital", luas: 160 },
+  { kode: "T-09", lantai: "Lt.10", nama: "CV Tirta Kreatif", bidang: "Kreatif", luas: 95 },
+  { kode: "T-10", lantai: "Lt.11", nama: "PT Sumber Energi", bidang: "Energi", luas: 220 },
 ];

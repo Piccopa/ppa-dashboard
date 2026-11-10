@@ -5,13 +5,13 @@
    ========================================================= */
 
 :root {
-  --bg: #4f6c8f;          /* latar belakang halaman */
-  --panel: #3d66c0;       /* latar kotak/panel */
+  --bg: #07121f;          /* latar belakang halaman */
+  --panel: #0c1b2c;       /* latar kotak/panel */
   --panel-2: #0f2236;     /* latar kartu di dalam panel */
   --border: #1b3550;      /* warna garis tepi */
   --text: #e6eef7;        /* warna teks utama */
-  --muted: #131414;       /* warna teks keterangan */
-  --accent: #f5d7ef;      /* warna judul (cyan) */
+  --muted: #8ea3b9;       /* warna teks keterangan */
+  --accent: #22d3ee;      /* warna judul (cyan) */
   --brand: #c8913f;       /* warna emas logo MITMAG */
   --green: #22c55e;
   --red: #dc2626;
@@ -56,7 +56,8 @@ button { font-family: inherit; cursor: pointer; }
 .header-row + .header-row { margin-top: 10px; }
 .brand { display: flex; align-items: center; gap: 12px; min-width: 330px; }
 .brand-logo {
-  height: 72px; padding: 4px 8px; border-radius: 8px;
+  height: 72px;            /* UKURAN LOGO: ubah angka ini untuk memperbesar / memperkecil */
+  padding: 5px 10px; border-radius: 10px;
   background: #fffaf2;     /* kotak terang agar logo emas terlihat jelas */
 }
 .brand-title { color: var(--accent); font-weight: 800; font-size: 17px; line-height: 1.2; letter-spacing: .2px; }
@@ -84,8 +85,8 @@ button { font-family: inherit; cursor: pointer; }
 .layout { display: flex; }
 .sidebar {
   width: 128px; flex-shrink: 0;
-  position: sticky; top: 112px; align-self: flex-start;
-  height: calc(100vh - 112px); overflow-y: auto;
+  position: sticky; top: var(--header-h, 112px); align-self: flex-start;
+  height: calc(100vh - var(--header-h, 112px)); overflow-y: auto;
   border-right: 1px solid var(--border); padding: 10px 0;
   background: var(--panel);
 }
@@ -100,7 +101,7 @@ button { font-family: inherit; cursor: pointer; }
 .module.active { display: block; }
 
 .panel {
-  scroll-margin-top: 120px;
+  scroll-margin-top: calc(var(--header-h, 112px) + 10px);
   background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 12px; min-width: 0;
 }

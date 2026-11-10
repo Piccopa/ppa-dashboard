@@ -42,7 +42,7 @@ function bukaModul(nama) {
     if (nama === "tower") buatSmartTower();
     else if (nama !== "manufacture") Scene3D.buat(nama);
   }
-  if (window.Scene3D) Scene3D.aktifkan(nama);
+  if (typeof Scene3D !== "undefined") Scene3D.aktifkan(nama);   // beri tahu modul 3D mana yang harus digambar
 }
 
 // Layar penuh untuk elemen tertentu (atau seluruh halaman)
@@ -548,6 +548,12 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btnFull").onclick = () => layarPenuh();
   $("#btnIntegrasi").onclick = () => toast("Mode integrasi: Simulasi — data dibuat otomatis. Lihat panduan untuk sensor asli.");
   $("#search").addEventListener("keydown", (e) => { if (e.key === "Enter") cari(e.target.value); });
+
+  // Ukur tinggi header agar menu samping selalu pas di bawahnya (berapa pun ukuran logo)
+  const aturTinggiHeader = () => document.documentElement.style.setProperty("--header-h", $(".app-header").offsetHeight + "px");
+  aturTinggiHeader();
+  window.addEventListener("resize", aturTinggiHeader);
+  $(".brand-logo").addEventListener("load", aturTinggiHeader);
 
   buatSmartManufacture();
   updateClock();
