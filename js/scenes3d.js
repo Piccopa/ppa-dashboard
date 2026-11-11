@@ -319,20 +319,24 @@ const Scene3D = (() => {
     const lapisan = { Off: null, pH: [4.5, 6.5], Kelembapan: [40, 80], NPK: [1.5, 3], "Oksigen DO": [3, 8], Kualitas: [100, 400], Debit: [10, 30], Suhu: [24, 32] };
     const data = {};
     Object.keys(lapisan).forEach((k) => (data[k] = Array.from({ length: 100 }, () => Math.random())));
-    const P = { tbs: 0, cpo: 61, anomali: 1, pilih: 37, lapis: "pH", truk: 1 };
+    const KAP_TANGKI = 560;                                                   // kapasitas tiap tangki CPO (ton, simulasi)
+    const P = { tbs: 46, anomali: 1, pilih: 37, lapis: "pH", lora: true, tangki: [78, 64, 52, 35], timbang: "Siap", muat: "Menunggu truk", tara: 0, isi: 0 };
     const v = kerangka("palm3d", {
       judul: `🌴 ${CONFIG.namaSingkat} Palm Oil Monitoring – Grow Palm 3D (100 Ha)`,
-      bar: { t1: "🌴 " + CONFIG.namaSingkat.toUpperCase(), t1s: "Palm Oil Monitoring", t2: `${CONFIG.namaSingkat} Palm Oil Monitoring`, t3: "Smart Plantation 100 Ha · 3D Digital Twin Kebun – Pabrik – Head Office", status: "Live" },
+      bar: { t1: "🌴 " + CONFIG.namaSingkat.toUpperCase(), t1s: "Palm Oil Monitoring", t2: `${CONFIG.namaSingkat} Palm Oil Monitoring`, t3: "Smart Plantation 100 Ha · LoRa IoT · PKS · Jembatan Timbang · Tangki CPO", status: "Live" },
       kiri: `<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
-          <div class="v3-kv" style="display:block"><span class="muted">Sensor online</span><br><b>700/700</b></div><div class="v3-kv" style="display:block"><span class="muted">Anomali CCTV AI</span><br><b data-k="anom">1</b></div>
-          <div class="v3-kv" style="display:block"><span class="muted">TBS masuk PKS</span><br><b data-k="tbs">0 t</b></div><div class="v3-kv" style="display:block"><span class="muted">Stok CPO</span><br><b data-k="cpo">61 t</b></div></div>
+          <div class="v3-kv" style="display:block"><span class="muted">Node LoRa online</span><br><b data-k="lora">12/12</b></div><div class="v3-kv" style="display:block"><span class="muted">Anomali CCTV AI</span><br><b data-k="anom">1</b></div>
+          <div class="v3-kv" style="display:block"><span class="muted">TBS masuk PKS</span><br><b data-k="tbs">0 t</b></div><div class="v3-kv" style="display:block"><span class="muted">Stok CPO</span><br><b data-k="cpo">0 t</b></div></div>
         <h5 style="margin-top:6px">LAYER SENSOR (HEATMAP / HEKTAR)</h5>
         <div style="display:flex;flex-wrap:wrap;gap:4px">${Object.keys(lapisan).map((k) => `<button class="btn sm" data-lap="${k}">${k}</button>`).join("")}</div>
         <div data-k="info" style="margin-top:8px"></div>`,
       kanan: `<h5>ALUR HULU → HILIR</h5><div data-k="alur"></div><div data-k="plog" style="font-size:10.5px;margin-top:6px"></div>`,
       bawah: [
-        { label: "🌐 Overview 100 Ha", aksi: (v) => v.orbit.ke(v.preset.Overview) }, { label: "🌴 Kebun", aksi: (v) => v.orbit.ke(v.preset.Kebun) },
-        { label: "🏭 PKS", aksi: (v) => v.orbit.ke(v.preset.PKS) }, { label: "🏢 Head Office", aksi: (v) => v.orbit.ke(v.preset.HO) },
+        { label: "🌐 Overview", aksi: (v) => v.orbit.ke(v.preset.Overview) }, { label: "🌴 Kebun", aksi: (v) => v.orbit.ke(v.preset.Kebun) },
+        { label: "🏭 PKS", aksi: (v) => v.orbit.ke(v.preset.PKS) }, { label: "⚖️ Jembatan Timbang", aksi: (v) => v.orbit.ke(v.preset.Timbang) },
+        { label: "🛢️ Tangki CPO", aksi: (v) => v.orbit.ke(v.preset.Tangki) },
+        { label: "📡 LoRa", aksi: (v, b) => { P.lora = !P.lora; b.classList.toggle("active", P.lora); links.forEach((l) => l.setTampil(P.lora)); lblNode.forEach((L) => (L.el.style.visibility = P.lora ? "" : "hidden")); if (P.lora) v.orbit.ke(v.preset.LoRa); } },
+        { label: "🏢 Head Office", aksi: (v) => v.orbit.ke(v.preset.HO) },
         { label: "🔄 Auto-Rotate", aksi: (v, b) => { v.orbit.auto = !v.orbit.auto; b.classList.toggle("active", v.orbit.auto); } },
         { label: "🔥 Simulasi Asap (CCTV AI)", bahaya: true, aksi: () => { P.pilih = Math.floor(Math.random() * 100); P.anomali++; toast("CCTV AI: indikasi asap di hektar " + namaPetak(P.pilih)); tandai(); } },
       ],
@@ -340,51 +344,112 @@ const Scene3D = (() => {
     dunia3D(v, 0x9fd3f2);
     v.langitSiang = 0x9fd3f2;
     const S = v.scene;
-    kotak(S, 700, 1, 700, 0x6fbf3a, 0, -1, 0);
-    kotak(S, 104, 0.4, 104, 0xc9a66b, 0, -0.2, 0);
-    kotak(S, 18, 0.6, 400, 0x2f80c7, 72, -0.4, 0);
+
+    // ---------- Tanah, blok kebun 100 Ha, sungai ----------
+    kotak(S, 700, 1, 700, 0x6aa84f, 0, -1, 0);
+    kotak(S, 104, 0.4, 104, 0xb08d57, 0, -0.2, 0);                           // jalan tanah antar blok
+    kotak(S, 18, 0.6, 400, 0x2f80c7, 72, -0.4, 0);                            // sungai
     const namaPetak = (i) => `${baris[Math.floor(i / 10)]}${(i % 10) + 1}`;
-    // 100 petak (1 petak = 1 hektar)
     const petak = [];
     for (let i = 0; i < 100; i++) {
       const x = -45 + (i % 10) * 10, z = -45 + Math.floor(i / 10) * 10;
-      petak.push(kotak(S, 9.2, 0.3, 9.2, 0x4f8f2f, x, 0, z));
+      petak.push(kotak(S, 9.2, 0.3, 9.2, 0x4f8f2f, x, 0, z));                // 1 petak = 1 hektar (warna = heatmap)
     }
-    // pohon sawit (InstancedMesh = ribuan objek sekaligus, ringan)
-    const N = 100 * 9;
-    const batang = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.25, 0.35, 2.4, 5), mat(0x6b4f2a), N);
-    const daun = new THREE.InstancedMesh(new THREE.ConeGeometry(1.6, 1.4, 7), mat(0x2e7d32), N);
-    const dm = new THREE.Object3D(); let n = 0;
+
+    // ---------- 1. Pohon kelapa sawit + tandan buah (js/sawit3d.js) ----------
+    const titikPohon = [];
     for (let i = 0; i < 100; i++) for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) {
-      const x = -48 + (i % 10) * 10 + a * 3 + rand(-0.4, 0.4), z = -48 + Math.floor(i / 10) * 10 + b * 3 + rand(-0.4, 0.4);
-      dm.position.set(x, 1.5, z); dm.rotation.set(0, Math.random() * 6, 0); dm.scale.set(1, 1, 1); dm.updateMatrix(); batang.setMatrixAt(n, dm.matrix);
-      dm.position.y = 3.1; dm.rotation.x = Math.PI; dm.updateMatrix(); daun.setMatrixAt(n, dm.matrix); n++;
+      titikPohon.push({ x: -48 + (i % 10) * 10 + a * 3 + (b % 2) * 0.8 + rand(-0.3, 0.3), z: -48 + Math.floor(i / 10) * 10 + b * 3 + rand(-0.3, 0.3) });
     }
-    batang.castShadow = daun.castShadow = true; S.add(batang, daun);
-    // titik sensor
-    const sensor = new THREE.InstancedMesh(new THREE.SphereGeometry(0.35, 6, 6), mat(0x67e8f9, { emissive: 0x22d3ee, emissiveIntensity: 1 }), 160);
-    for (let i = 0; i < 160; i++) { dm.position.set(rand(-49, 49), 3.8, rand(-49, 49)); dm.rotation.set(0, 0, 0); dm.updateMatrix(); sensor.setMatrixAt(i, dm.matrix); }
-    S.add(sensor);
-    // gateway LoRa, kantor, timbangan, PKS
-    kotak(S, 0.8, 16, 0.8, 0xe5e7eb, 0, 0, 0);
-    kotak(S, 14, 5, 9, 0x1f2937, -40, 0, 66); kotak(S, 14.2, 0.5, 9.2, 0x22c55e, -40, 5, 66);
-    kotak(S, 8, 0.6, 3, 0x94a3b8, -18, 0, 66);
-    kotak(S, 18, 9, 12, 0x1e3a8a, 6, 0, 72); tabung(S, 3, 3, 10, 0xe5e7eb, 20, 0, 70); tabung(S, 3, 3, 10, 0xe5e7eb, 20, 0, 78); tabung(S, 0.8, 0.8, 18, 0x64748b, 0, 0, 78, 8);
-    kotak(S, 8, 0.2, 60, 0xb08d57, -30, 0, 80); kotak(S, 120, 0.2, 5, 0xb08d57, 0, 0, 56);
-    const truk = new THREE.Group(); kotak(truk, 5, 2.4, 2.4, 0xf59e0b, 0, 0.3, 0); kotak(truk, 1.8, 2, 2.4, 0x1f2937, 3.4, 0.3, 0); S.add(truk);
-    // penanda hektar anomali
+    Sawit3D.kebun(S, titikPohon);
+
+    // ---------- 2. LoRa: menara gateway di tengah kebun + 12 titik sensor ----------
+    const gateway = Sawit3D.menaraLoRa(S, 0, 0, 22);
+    const posNode = [[-40, -40], [-10, -40], [20, -40], [40, -10], [-30, -20], [10, -20], [-40, 10], [-20, 20], [20, 10], [40, 30], [-10, 40], [20, 40]];
+    const nodes = posNode.map(([x, z], i) => ({ ...Sawit3D.nodeLoRa(S, x, z), id: "LN-" + String(i + 1).padStart(2, "0"), suhu: 27 + rand(-1.5, 1.5), rh: 72 + rand(-8, 8), fase: i * 0.55 }));
+    const links = nodes.map((n) => Sawit3D.linkLoRa(S, n.puncak, gateway.puncak));
+
+    // ---------- Jalan raya + jembatan sungai ----------
+    kotak(S, 440, 0.12, 5.4, 0x374151, 0, 0, 60);
+    for (let x = -215; x < 215; x += 6) kotak(S, 2.5, 0.14, 0.15, 0xffffff, x, 0, 60);                 // marka tengah
+    [57.45, 62.55].forEach((z) => kotak(S, 440, 0.14, 0.12, 0xfacc15, 0, 0, z));                       // marka tepi
+    kotak(S, 22, 0.3, 6.4, 0x6b7280, 72, 0.1, 60);                                                     // jembatan sungai
+    [56.9, 63.1].forEach((z) => kotak(S, 22, 0.9, 0.2, 0xcbd5e1, 72, 0.4, z));
+    // Jalan akses pabrik (2 lajur) dan jalan dalam pabrik
+    kotak(S, 5.4, 0.12, 33, 0x3f4652, -41, 0.01, 78.5);
+    kotak(S, 88, 0.12, 5.4, 0x3f4652, 0.2, 0.01, 92);
+    tabung(S, 4.2, 4.2, 0.12, 0x3f4652, 44.2, 0.01, 92, 28);                                         // putaran balik truk
+
+    // ---------- 4. Pabrik Kelapa Sawit (sortasi, sterilizer, press, boiler, kernel, POME) ----------
+    const pks = Sawit3D.pks(S);
+
+    // ---------- 6. Tangki timbun CPO (4 unit) + tanggul + loading ----------
+    const tangki = [-2, 10, 22, 34].map((x, i) => Sawit3D.tangkiCPO(S, x, 78, "CPO-" + (i + 1)));
+    [[16, 71.5, 50, 0.4], [16, 84.5, 50, 0.4]].forEach(([x, z, L, d]) => kotak(S, L, 1, d, 0xb9bdc1, x, 0, z));
+    [[-9, 78], [41, 78]].forEach(([x, z]) => kotak(S, 0.4, 1, 13, 0xb9bdc1, x, 0, z));
+    // Gantry pengisian (loading arm) di tepi jalan
+    [[23.6, 87.4], [28.4, 87.4]].forEach(([x, z]) => kotak(S, 0.3, 5, 0.3, 0x475569, x, 0, z));
+    kotak(S, 5.4, 0.3, 2.2, 0x475569, 26, 5, 88.2); kotak(S, 0.25, 0.25, 3.4, 0xeab308, 26, 5.3, 89.6);
+    const pipaIsi = kotak(S, 0.25, 2.4, 0.25, 0xeab308, 26, 2.9, 90.7);
+    kotak(S, 0.4, 0.4, 7.5, 0x94a3b8, 22, 0.6, 83.3);                                                  // pipa dari tangki CPO-3
+
+    // ---------- 5. Jembatan timbang (lajur masuk x=-42,3, keluar x=-39,7) ----------
+    const wb = Sawit3D.jembatanTimbang(S, -42.3, -39.7, 78);
+
+    // ---------- Head office ----------
+    const ho = Model3D.kantor({ lebar: 12, dalam: 9, tinggi: 15, nama: CONFIG.namaSingkat }); ho.position.set(-58, 0, 76); S.add(ho);
+    kotak(S, 14, 0.1, 6, 0x374151, -58, 0.02, 84);
+
+    // ---------- 3. Truk tangki: lalu lintas jalan raya + truk yang menimbang & mengisi CPO ----------
+    const V3 = (x, z, y = 0.12) => new THREE.Vector3(x, y, z);
+    const varian = [{ jenis: "tangki", warnaKabin: 0xdc2626 }, { jenis: "tangki", warnaKabin: 0x1d4ed8 }, { jenis: "tangki", warnaKabin: 0xf8fafc }, { jenis: "tangki", warnaKabin: 0x15803d }];
+    const lalin = varian.map((o, i) => {
+      const t = Model3D.truk(o); t.scale.setScalar(0.4); S.add(t);
+      const timur = i % 2 === 0;
+      const r = Sawit3D.rute(t, timur ? [V3(-215, 58.7), V3(215, 58.7)] : [V3(215, 61.3), V3(-215, 61.3)], 9 + i);
+      r.st.s = (i * 110) % 430;
+      return r;
+    });
+    const trukPKS = Model3D.truk({ jenis: "tangki", warnaKabin: 0xc8913f }); trukPKS.scale.setScalar(0.4); S.add(trukPKS);
+    const jalurPKS = [V3(-215, 58.7), V3(-47, 58.7), V3(-42.3, 64.5), V3(-42.3, 78), V3(-42.3, 87.5), V3(-38.5, 90.7), V3(26, 90.7), V3(40, 90.7), V3(44.8, 92), V3(40, 93.3),
+      V3(-35.5, 93.3), V3(-39.7, 89), V3(-39.7, 78), V3(-39.7, 64.5), V3(-44, 61.3), V3(-215, 61.3)];
+    const rutePKS = Sawit3D.rute(trukPKS, jalurPKS, 7, { 3: 6, 6: 8, 12: 6 });     // berhenti: timbang tara 6 s, isi CPO 8 s, timbang bruto 6 s
+    rutePKS.st.s = 150;
+    let fase = { kode: -1, mulai: 0 };
+    const kg = (n) => fmt(Math.round(n / 10) * 10) + " kg";
+    function saatBerhenti(i, jenis) {
+      fase = { kode: jenis === "berhenti" ? i : -1, mulai: performance.now() };
+      if (jenis === "berhenti" && i === 3) { P.tara = 14200 + Math.round(rand(0, 400)); P.timbang = "Menimbang tara"; }
+      if (jenis === "berhenti" && i === 6) { P.isi = 30000 + Math.round(rand(-800, 800)); P.muat = "Mengisi CPO…"; }
+      if (jenis === "berhenti" && i === 12) P.timbang = "Menimbang bruto";
+      if (jenis === "jalan" && i === 3) { P.timbang = "Tara " + kg(P.tara); setTimeout(() => wb.tulis(0, "0 kg", "SIAP"), 6000); }
+      if (jenis === "jalan" && i === 6) { P.muat = "Selesai · " + fmt(P.isi / 1000, 1) + " t"; P.tangki[2] = Math.max(8, P.tangki[2] - (P.isi / 1000 / KAP_TANGKI) * 100); }
+      if (jenis === "jalan" && i === 12) { P.timbang = "Bruto " + kg(P.tara + P.isi); setTimeout(() => { wb.tulis(1, "0 kg", "SIAP"); P.muat = "Menunggu truk"; }, 6000); }
+    }
+
+    // ---------- Penanda hektar anomali ----------
     const cincin = new THREE.Mesh(new THREE.RingGeometry(5.5, 6.5, 32), new THREE.MeshBasicMaterial({ color: 0xff3b30, side: THREE.DoubleSide, transparent: true }));
     cincin.rotation.x = -Math.PI / 2; S.add(cincin);
-    label(v, "LoRa Gateway", 0, 18, 0, () => "700 sensor");
-    label(v, "Head Office", -40, 8, 66, () => "Control Room");
-    label(v, "Timbangan", -18, 3, 66, () => P.truk + " truk");
-    label(v, "PKS", 6, 12, 72, () => fmt(1.6, 1) + " t hopper");
-    const lblAnom = label(v, "⚠ Anomali", 0, 6, 0, () => ({ t: namaPetak(P.pilih), off: true }));
+
+    // ---------- Label ----------
+    label(v, "📡 LoRa Gateway", 0, 27.5, 0, () => `${nodes.length} node · −97 dBm`);
+    const lblNode = nodes.map((n) => label(v, n.id, n.puncak.x, n.puncak.y + 1, n.puncak.z, () => `${fmt(n.suhu, 1)}°C · ${fmt(n.rh)}%RH`));
+    label(v, "⚖️ Jembatan Timbang", -41, 9.5, 78, () => P.timbang);
+    label(v, "Loading Ramp & Sortasi TBS", -20, 10, 106, () => `TBS ${fmt(P.tbs, 1)} t · Grade A 91%`);
+    label(v, "Sterilizer", 6, 8, 106, () => "3 unit · " + fmt(2.8 + rand(-0.1, 0.1), 1) + " bar");
+    label(v, "Thresher & Press", 24, 18, 108, () => "Olah " + fmt(45 + rand(-1, 1), 1) + " t TBS/jam");
+    label(v, "Boiler", 43, 15, 110, () => "Uap " + fmt(20 + rand(-0.5, 0.5), 1) + " t/jam");
+    label(v, "Cerobong", pks.cerobong.x, pks.cerobong.y + 3, pks.cerobong.z, () => "Opasitas " + fmt(18 + rand(-2, 2)) + " %");
+    label(v, "Kernel Plant", 4, 13, 124, () => "Kernel " + fmt(14 + rand(-0.3, 0.3), 1) + " t");
+    tangki.forEach((tk, i) => label(v, "Tangki CPO-" + (i + 1), [-2, 10, 22, 34][i], tk.puncakY + 2, 78, () => `${fmt(P.tangki[i], 1)} % · ${fmt((P.tangki[i] / 100) * KAP_TANGKI)} t`));
+    label(v, "Loading CPO", 26, 7, 88, () => P.muat);
+    label(v, "Head Office", -58, 17, 76, () => "Control Room");
+    const lblAnom = label(v, "⚠ Anomali", 0, 8, 0, () => ({ t: namaPetak(P.pilih), off: true }));
+
     function tandai() {
       const x = -45 + (P.pilih % 10) * 10, z = -45 + Math.floor(P.pilih / 10) * 10;
-      cincin.position.set(x, 0.6, z); lblAnom.pos.set(x, 6, z); cincin.visible = true; lblAnom.el.style.visibility = ""; infoPetak();
+      cincin.position.set(x, 0.6, z); lblAnom.pos.set(x, 9, z); cincin.visible = true; lblAnom.el.style.visibility = ""; infoPetak();
     }
-    // warna heatmap
     const palet = (t) => new THREE.Color().setHSL(0.0 + t * 0.33, 0.75, 0.42);
     function warnai() {
       v.el.querySelectorAll("[data-lap]").forEach((b) => b.classList.toggle("active", b.dataset.lap === P.lapis));
@@ -400,34 +465,67 @@ const Scene3D = (() => {
       v.el.querySelector("[data-selesai]").onclick = () => { P.anomali = Math.max(0, P.anomali - 1); cincin.visible = false; lblAnom.el.style.visibility = "hidden"; toast("Anomali hektar " + namaPetak(i) + " ditandai selesai"); };
     }
     v.el.querySelectorAll("[data-lap]").forEach((b) => (b.onclick = () => { P.lapis = b.dataset.lap; warnai(); }));
-    // klik petak untuk melihat datanya
+    v.el.querySelectorAll("[data-bot]").forEach((b) => { if (b.textContent.includes("LoRa")) b.classList.add("active"); });
     const ray = new THREE.Raycaster();
     v.renderer.domElement.addEventListener("dblclick", (e) => {
       const r = v.renderer.domElement.getBoundingClientRect();
       ray.setFromCamera({ x: ((e.clientX - r.left) / r.width) * 2 - 1, y: -((e.clientY - r.top) / r.height) * 2 + 1 }, v.camera);
       const hit = ray.intersectObjects(petak)[0];
-      if (hit) { P.pilih = petak.indexOf(hit.object); cincin.visible = true; lblAnom.el.style.visibility = ""; tandai(); }
+      if (hit) { P.pilih = petak.indexOf(hit.object); tandai(); }
     });
     warnai(); tandai();
-    v.preset = { Overview: [1.2, 0.85, 190, [0, 0, 10]], Kebun: [0.8, 0.7, 90, [0, 0, -10]], PKS: [1.4, 0.9, 60, [8, 0, 72]], HO: [1.9, 0.9, 50, [-40, 0, 66]] };
+
+    v.preset = {
+      Overview: [1.25, 0.9, 225, [0, 0, 45]], Kebun: [3.6, 1.22, 24, [-42, 3, -46]], PKS: [1.45, 0.88, 110, [18, 4, 108]],
+      Timbang: [0.55, 0.95, 30, [-41, 0, 80]], Tangki: [1.3, 0.9, 62, [16, 4, 82]], LoRa: [1.0, 0.8, 80, [0, 8, 0]], HO: [1.9, 0.9, 48, [-58, 5, 76]],
+    };
     v.orbit.ke(v.preset.Overview);
+
+    // ---------- Animasi tiap frame ----------
+    let tLalu = 0;
     v.updaters.push((t) => {
-      const u = (t / 60) % 160;
-      truk.position.set(u < 80 ? -60 + u * 1.2 : 36 - (u - 80) * 1.2, 0, 56);
-      truk.rotation.y = u < 80 ? 0 : Math.PI;
+      const dt = Math.min(0.1, (t - tLalu) / 1000); tLalu = t;
+      const dtk = t / 1000;
+      // LoRa: tiap node mengirim (Tx) setiap 7 detik, lalu gateway membalas (Rx)
+      nodes.forEach((n, i) => {
+        const u = (dtk + n.fase) % 7, arah = u < 1.8 ? "tx" : u < 2.8 ? "rx" : "idle";
+        if (P.lora) links[i].update(dtk, arah);
+        n.led.material.emissive.set(arah === "tx" ? 0x22d3ee : arah === "rx" ? 0xfacc15 : 0x22c55e);
+        n.led.material.color.copy(n.led.material.emissive);
+      });
+      gateway.lampu.material.emissiveIntensity = Math.sin(t / 350) > 0 ? 1 : 0.1;
+      pks.anim.forEach((f) => f(t));
+      lalin.forEach((r) => r.update(dt));
+      rutePKS.update(dt, saatBerhenti);
+      // Layar timbangan: angka bergulir lalu stabil
+      const lama = (performance.now() - fase.mulai) / 1000;
+      if (fase.kode === 3) wb.tulis(0, lama < 2 ? kg(P.tara * (0.6 + Math.random() * 0.4)) : kg(P.tara), lama < 2 ? "MENIMBANG…" : "TARA ✓", lama < 2 ? "#facc15" : "#22c55e");
+      if (fase.kode === 12) wb.tulis(1, lama < 2 ? kg((P.tara + P.isi) * (0.7 + Math.random() * 0.3)) : kg(P.tara + P.isi), lama < 2 ? "MENIMBANG…" : `BRUTO ✓ NETO ${fmt(P.isi)}`, lama < 2 ? "#facc15" : "#22c55e");
+      // Pipa pengisian turun saat truk diisi
+      pipaIsi.scale.y = fase.kode === 6 ? 1.6 : 1;
+      // Palang pintu naik saat truk lewat
+      [[wb.palang[0], -42.3, 83.6], [wb.palang[1], -39.7, 72.4]].forEach(([p, x, z]) => {
+        const dekat = Math.hypot(trukPKS.position.x - x, trukPKS.position.z - z) < 7 && rutePKS.st.tunggu <= 0.5;
+        p.rotation.z += ((dekat ? (x < -41 ? -1.3 : 1.3) : 0) - p.rotation.z) * Math.min(1, dt * 4);
+      });
       cincin.material.opacity = 0.5 + Math.sin(t / 200) * 0.4;
     });
+
     v.detik = () => {
-      P.tbs += Math.random() < 0.3 ? 0.1 : 0; P.cpo += Math.random() < 0.1 ? 0.1 : 0; P.truk = Math.random() < 0.5 ? 0 : 1;
+      P.tbs += Math.random() < 0.4 ? 0.1 : 0;
+      P.tangki = P.tangki.map((l, i) => Math.min(96, l + (i === 0 || i === 1 ? 0.02 : 0)));      // produksi CPO mengisi tangki 1 & 2
+      nodes.forEach((n) => { n.suhu += rand(-0.05, 0.05); n.rh += rand(-0.3, 0.3); });
+      const stok = P.tangki.reduce((a, l) => a + (l / 100) * KAP_TANGKI, 0);
       const set = (k, h) => (v.el.querySelector(`[data-k="${k}"]`).innerHTML = h);
-      set("anom", P.anomali); set("tbs", fmt(P.tbs, 1) + " t"); set("cpo", fmt(P.cpo) + " t");
-      set("alur", [["🌴 Panen kebun", `${48 + Math.round(rand(-2, 2))} pekerja · ${fmt(P.tbs, 1)} t`], ["📦 TPH menunggu", fmt(16.1, 1) + " t"], ["🚚 Angkut TBS", `1/4 truk jalan`],
-        ["⚖️ Timbangan", P.truk + " truk"], ["🏭 PKS hopper → press", `1,6 t · olah 4 t`], ["🛢️ Tangki CPO · kernel", `${fmt(P.cpo)} t · 14 t`], ["🚢 Kirim pelabuhan", "0 t CPO"]]
+      set("anom", P.anomali); set("tbs", fmt(P.tbs, 1) + " t"); set("cpo", fmt(stok) + " t"); set("lora", nodes.length + "/" + nodes.length);
+      set("alur", [["🌴 Panen kebun", `${48 + Math.round(rand(-2, 2))} pekerja`], ["📡 LoRa sensor", `${nodes.length} node · Tx/Rx OK`], ["🚚 TBS masuk ramp", `${fmt(P.tbs, 1)} t`],
+        ["🏭 Olah PKS", "45 t TBS/jam"], ["🛢️ Stok CPO (4 tangki)", `${fmt(stok)} t`], ["⚖️ Jembatan timbang", P.timbang], ["🚛 Loading CPO", P.muat]]
         .map((r) => `<div class="v3-row"><span class="muted">${r[0]}</span><b>${r[1]}</b></div>`).join(""));
-      set("plog", `<span class="muted">${jam()} Debit irigasi stabil</span><br><span style="color:#f87171">${jam()} ⚠ CCTV AI ${namaPetak(P.pilih)} Asap / indikasi kebakaran</span>`);
+      set("plog", `<span class="muted">${jam()} ${P.timbang} · ${P.muat}</span><br><span style="color:#f87171">${jam()} ⚠ CCTV AI ${namaPetak(P.pilih)} Asap / indikasi kebakaran</span>`);
     };
     return v;
   }
+
 
   /* ======================================================
      MODUL D — POWER PLANT 3D (PLTU)
