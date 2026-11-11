@@ -103,7 +103,6 @@ function renderTenant() {
       <div class="meter-grid">${t.layanan.map((l) => `<div class="meter ${l.status === "PUTUS" ? "cut" : ""}"><span class="led"></span><div class="label">${ikon[l.jenis]} ${namaLayanan[l.jenis]}</div>${nilai(l)}</div>`).join("")}</div>
       <div class="bill-chips">${t.layanan.map(chip).join("")}</div>
       <button class="btn green sm" onclick="bayarTenant(${i})">💳 Bayar</button>
-      <button class="btn sm" onclick="bukaModul('tower3d')">🏢 Lihat di 3D</button>
     </div>`;
   }).join("");
   const sum = [

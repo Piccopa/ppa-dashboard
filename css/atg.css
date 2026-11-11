@@ -1,0 +1,120 @@
+/* =========================================================
+   ATG.CSS — tampilan halaman 3D Automatic Tank Gauge
+   Semua class diawali "atg-" supaya tidak bentrok dengan style.css
+   ========================================================= */
+
+.atg { --atg-gold: #d4a24c; --atg-ok: #22c55e; --atg-warn: #facc15; --atg-crit: #ef4444; --atg-off: #94a3b8; }
+.atg .digital { font-family: "Share Tech Mono", "Consolas", monospace; letter-spacing: .5px; }
+
+/* ----- Kepala halaman + tab ----- */
+.atg-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; }
+.atg-title { font-weight: 800; font-size: 16px; color: var(--accent); letter-spacing: .5px; }
+.atg-title small { display: block; font-size: 11px; font-weight: 600; color: var(--atg-gold); letter-spacing: 1px; }
+.atg-tabs { display: flex; gap: 6px; margin-left: auto; }
+.atg-tabs button { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; font-weight: 600; font-size: 12.5px; }
+.atg-tabs button.active { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.atg-mode { font-size: 11.5px; color: var(--muted); text-align: right; line-height: 1.35; }
+.atg-mode b { color: var(--atg-ok); }
+
+/* ----- Kartu ringkasan ----- */
+.atg-summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.atg-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; border-left: 3px solid var(--accent); }
+.atg-card .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+.atg-card .v { font-size: 24px; font-weight: 700; margin-top: 2px; }
+.atg-card .v small { font-size: 12px; color: var(--muted); }
+.atg-card.alarm { border-left-color: var(--atg-crit); }
+.atg-card.alarm .v { color: var(--atg-crit); }
+
+/* ----- Badan: tampilan 3D + panel samping ----- */
+.atg-body { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 10px; }
+.atg-view { position: relative; height: 660px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: #0b1622; }
+.atg-view canvas { display: block; width: 100%; height: 100%; }
+.atg-toolbar { position: absolute; left: 10px; top: 10px; display: flex; flex-wrap: wrap; gap: 5px; max-width: calc(100% - 20px); }
+.atg-toolbar button { background: rgba(8, 18, 30, .85); color: #e6eef7; border: 1px solid #1d3550; border-radius: 5px; padding: 5px 9px; font-size: 11.5px; }
+.atg-toolbar button.on { border-color: #22d3ee; color: #22d3ee; }
+.atg-hint { position: absolute; left: 10px; bottom: 10px; background: rgba(8, 18, 30, .8); color: #cbd5e1; font-size: 10.5px; padding: 4px 8px; border-radius: 5px; }
+.atg-legend { position: absolute; right: 10px; bottom: 10px; background: rgba(8, 18, 30, .8); color: #cbd5e1; font-size: 10.5px; padding: 5px 8px; border-radius: 5px; display: flex; gap: 10px; }
+.atg-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+
+/* Label melayang di atas tangki (overview) */
+.atg-tlabel { position: absolute; transform: translate(-50%, -100%); background: rgba(6, 16, 28, .9); border: 1px solid #2dd4bf; border-radius: 6px; padding: 4px 8px; color: #fff; font-size: 11px; min-width: 112px; cursor: pointer; pointer-events: auto; }
+.atg-tlabel .id { font-weight: 800; color: #22d3ee; }
+.atg-tlabel .bar { height: 5px; background: #1e293b; border-radius: 3px; margin: 3px 0; overflow: hidden; }
+.atg-tlabel .bar i { display: block; height: 100%; background: #22d3ee; }
+.atg-tlabel.warn { border-color: var(--atg-warn); } .atg-tlabel.crit { border-color: var(--atg-crit); animation: atgKedip 1s infinite; }
+.atg-tlabel.sel { box-shadow: 0 0 0 2px #d4a24c; }
+/* Label instrumen (detail) */
+.atg-ilabel { position: absolute; transform: translate(-50%, -100%); background: rgba(6, 16, 28, .88); border: 1px solid #334155; border-left: 3px solid var(--atg-ok); border-radius: 4px; padding: 2px 6px; color: #e2e8f0; font-size: 10.5px; white-space: nowrap; cursor: pointer; pointer-events: auto; }
+.atg-ilabel b { color: #22d3ee; font-family: "Share Tech Mono", monospace; font-weight: 400; font-size: 11.5px; }
+.atg-ilabel.warn { border-left-color: var(--atg-warn); } .atg-ilabel.crit { border-left-color: var(--atg-crit); } .atg-ilabel.off { border-left-color: var(--atg-off); }
+.atg-ilabel.sel { border-color: #d4a24c; box-shadow: 0 0 0 1px #d4a24c; }
+@keyframes atgKedip { 50% { box-shadow: 0 0 0 3px rgba(239, 68, 68, .6); } }
+
+/* ----- Panel samping ----- */
+.atg-side { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px; height: 660px; overflow-y: auto; }
+.atg-side h4 { margin: 4px 0 8px; color: var(--accent); font-size: 13px; text-transform: uppercase; letter-spacing: .8px; }
+.atg-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.atg-table th { color: var(--muted); font-weight: 600; text-align: left; padding: 5px 4px; border-bottom: 1px solid var(--border); }
+.atg-table td { padding: 6px 4px; border-bottom: 1px solid var(--border); }
+.atg-table tr { cursor: pointer; }
+.atg-table tr:hover td, .atg-table tr.sel td { background: var(--panel-2); }
+.atg-mini { height: 5px; background: #1e293b; border-radius: 3px; overflow: hidden; margin-top: 3px; }
+.atg-mini i { display: block; height: 100%; background: #22d3ee; }
+.atg-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+.atg-dot.ok { background: var(--atg-ok); } .atg-dot.warn { background: var(--atg-warn); } .atg-dot.crit { background: var(--atg-crit); }
+.atg-btn { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 600; }
+.atg-btn:hover { border-color: var(--accent); }
+.atg-btn.full { width: 100%; margin-top: 8px; }
+
+/* Panel instrumen */
+.atg-tankhead { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 8px; }
+.atg-tankhead .id { font-size: 20px; font-weight: 800; color: var(--accent); }
+.atg-tankhead .pr { font-size: 11.5px; color: var(--atg-gold); }
+.atg-big { text-align: right; }
+.atg-big .v { font-size: 30px; color: #22d3ee; line-height: 1; }
+.atg-big .k { font-size: 10.5px; color: var(--muted); }
+.atg-grp { margin-bottom: 8px; }
+.atg-grp .gt { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin: 6px 0 4px; }
+.atg-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 7px; border: 1px solid var(--border); border-radius: 5px; margin-bottom: 4px; cursor: pointer; background: var(--panel-2); }
+.atg-row:hover { border-color: var(--accent); }
+.atg-row.sel { border-color: var(--atg-gold); }
+.atg-row .tag { font-size: 11.5px; font-weight: 700; }
+.atg-row .tag small { display: block; font-weight: 400; color: var(--muted); font-size: 10.5px; }
+.atg-row .val { font-size: 15px; color: #e2e8f0; text-align: right; }
+.atg-row .val small { font-size: 10.5px; color: var(--muted); }
+.atg-chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.atg-chip { text-align: center; border-radius: 5px; padding: 5px 2px; font-size: 11px; font-weight: 700; color: #052e16; background: var(--atg-ok); cursor: pointer; }
+.atg-chip small { display: block; font-weight: 600; font-size: 9.5px; }
+.atg-chip.warn { background: var(--atg-warn); color: #422006; } .atg-chip.crit { background: var(--atg-crit); color: #fff; }
+.atg-st { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; color: #fff; background: #475569; }
+.atg-st.ok { background: #15803d; } .atg-st.warn { background: #ca8a04; } .atg-st.crit { background: #b91c1c; } .atg-st.off { background: #64748b; }
+.atg-detail { border: 1px solid var(--atg-gold); border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 11.5px; background: rgba(212, 162, 76, .06); }
+.atg-detail table { width: 100%; border-collapse: collapse; }
+.atg-detail td { padding: 3px 2px; border-bottom: 1px dashed var(--border); }
+.atg-detail td:first-child { color: var(--muted); width: 42%; }
+
+/* ----- Panel simulasi ----- */
+.atg-sim { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-top: 10px; }
+.atg-sim-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.atg-sim-head h4 { margin: 0; color: var(--atg-gold); font-size: 13px; text-transform: uppercase; letter-spacing: .8px; }
+.atg-sim-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.atg-simbox { border: 1px solid var(--border); border-radius: 6px; padding: 7px; background: var(--panel-2); }
+.atg-simbox .t { font-size: 11px; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+.atg-simbox .b { display: flex; gap: 4px; flex-wrap: wrap; }
+.atg-simbox button { flex: 1; min-width: 44px; background: #0b1622; color: #e2e8f0; border: 1px solid #334155; border-radius: 5px; padding: 5px 4px; font-size: 11px; font-weight: 700; }
+.atg-simbox button.g { border-color: #16a34a; color: #4ade80; } .atg-simbox button.r { border-color: #b91c1c; color: #f87171; } .atg-simbox button.y { border-color: #ca8a04; color: #facc15; }
+.atg-simbox button:hover { filter: brightness(1.3); }
+.atg-simbox .now { font-size: 10.5px; margin-top: 5px; color: #cbd5e1; }
+.atg-log { font-size: 10.5px; color: var(--muted); margin-top: 8px; max-height: 64px; overflow-y: auto; line-height: 1.5; }
+.atg-log b { color: var(--atg-warn); font-weight: 600; }
+
+/* body.light: tampilan 3D tetap gelap agar kontras */
+body.light .atg-row .val, body.light .atg-tankhead .id { color: var(--text); }
+
+@media (max-width: 1300px) { .atg-sim-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 1100px) {
+  .atg-body { grid-template-columns: minmax(0, 1fr); }
+  .atg-side { height: auto; max-height: 520px; }
+  .atg-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .atg-view { height: 520px; }
+}

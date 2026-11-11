@@ -40,9 +40,11 @@ function bukaModul(nama) {
   if (!sudahDibuka[nama]) {
     sudahDibuka[nama] = true;
     if (nama === "tower") buatSmartTower();
+    else if (nama === "atg3d") ATG_UI.buka();                     // halaman 3D Automatic Tank Gauge
     else if (nama !== "manufacture") Scene3D.buat(nama);
   }
   if (typeof Scene3D !== "undefined") Scene3D.aktifkan(nama);   // beri tahu modul 3D mana yang harus digambar
+  if (typeof ATG_UI !== "undefined") ATG_UI.setAktif(nama === "atg3d");
 }
 
 // Layar penuh untuk elemen tertentu (atau seluruh halaman)

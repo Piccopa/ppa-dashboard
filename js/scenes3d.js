@@ -312,122 +312,6 @@ const Scene3D = (() => {
   }
 
   /* ======================================================
-     MODUL B — 3D SMART TOWER (gedung di kota malam)
-     ====================================================== */
-  function scene_tower3d() {
-    const T = { pompa: false, lampu: true, hvac: true, cctv: true, akses: true, genset: "AUTO", api: false, padam: false, alarm: 0, log: "Sistem normal" };
-    const v = kerangka("tower3d", {
-      judul: `🌃 3D Smart Tower – ${CONFIG.namaSingkat} Smart Tower`,
-      bar: { t1: CONFIG.namaSingkat.toUpperCase(), t1s: "SMART TOWER", t2: "Digital Twin 3D – Smart Tower", t3: "BMS · Genset · Data Centre · LVMDP · Pompa · Fire Fighting · CCTV" },
-      kiri: `<div class="v3-kv"><span>Beban Total</span><b data-k="beban">-</b></div><div class="v3-kv"><span>Okupansi</span><b data-k="okup">-</b></div>
-        <div class="v3-kv"><span>Suhu Rata²</span><b data-k="suhu">-</b></div><div class="v3-kv"><span>Alarm Aktif</span><b data-k="alarm">0</b></div>
-        <div class="v3-kv"><span>Tenant Terputus</span><b data-k="putus">-</b></div><div data-k="log" class="muted" style="font-size:10.5px;margin-top:6px"></div>`,
-      kanan: `<h5>▮ Kontrol Instrumen</h5>${[["pompa", "💧 Pompa"], ["lampu", "💡 Lampu"], ["hvac", "❄️ HVAC"], ["cctv", "📹 CCTV"], ["akses", "🔐 Access Control"]]
-        .map(([k, n]) => `<div class="v3-row"><span>${n}</span><span class="toggle" data-tg="${k}"></span><button class="btn sm" data-sw="${k}"></button></div>`).join("")}
-        <div class="v3-row"><span>⚙️ Genset</span><span class="toggle" data-tg="genset"></span></div>
-        <div style="display:flex;gap:4px;justify-content:flex-end;margin-top:6px">${["AUTO", "RUN", "STOP"].map((m) => `<button class="btn sm" data-gm="${m}">${m}</button>`).join("")}</div>`,
-      bawah: [
-        { label: "🌐 Overview", aksi: (v) => v.orbit.ke(v.preset.Overview) }, { label: "🏢 Tower", aksi: (v) => v.orbit.ke(v.preset.Tower) },
-        { label: "⚙️ Genset", aksi: (v) => v.orbit.ke(v.preset.Genset) }, { label: "🖥️ Data Centre", aksi: (v) => v.orbit.ke(v.preset.DC) },
-        { label: "⚡ LVMDP", aksi: (v) => v.orbit.ke(v.preset.LVMDP) }, { label: "🧯 Pompa/Fire", aksi: (v) => v.orbit.ke(v.preset.Pompa) },
-        { label: "📹 CCTV", aksi: (v) => v.orbit.ke(v.preset.Overview) },
-        { label: "🔄 Auto-Rotate", aksi: (v, b) => { v.orbit.auto = !v.orbit.auto; b.classList.toggle("active", v.orbit.auto); } },
-        { label: "🧊 X-Ray", aksi: (v, b) => { v.xray = !v.xray; b.classList.toggle("active", v.xray); v.lantai.forEach((m) => { m.material.transparent = v.xray; m.material.opacity = v.xray ? 0.25 : 1; }); } },
-        { label: "🌙 Malam", aksi: (v, b) => { setMalam(v, !v.malam); b.innerHTML = v.malam ? "🌞 Siang" : "🌙 Malam"; } },
-        { label: "🔥 Simulasi Kebakaran", bahaya: true, aksi: () => { T.api = !T.api; T.alarm = T.api ? 1 : 0; T.log = T.api ? "ALARM: asap & panas terdeteksi di Lt.8 – pompa fire otomatis ON" : "Kebakaran ditangani – sistem normal"; T.pompa = T.api || T.pompa; toast(T.log); } },
-        { label: "⚡ Simulasi PLN Padam", bahaya: true, aksi: () => { T.padam = !T.padam; T.log = T.padam ? "PLN padam – genset start otomatis (ATS)" : "PLN kembali normal – genset standby"; toast(T.log); } },
-        { label: "📟 Meter Tenant", aksi: () => bukaModul("tower") },
-      ],
-    });
-    dunia3D(v, 0x0b1424);
-    v.langitSiang = 0x7aa0c4; v.langitMalam = 0x0b1424; v.malam = true;
-    v.hemi.intensity = 0.3; v.sun.intensity = 0.15;
-    const S = v.scene;
-    kotak(S, 600, 1, 600, 0x1a2333, 0, -1, 0);
-    kotak(S, 70, 0.3, 60, 0x10233d, 0, 0, 5);
-    // garis biru menyala di plaza
-    const neon = mat(0x22d3ee, { emissive: 0x22d3ee, emissiveIntensity: 1 });
-    kotak(S, 70, 0.4, 0.4, neon, 0, 0, -25); kotak(S, 70, 0.4, 0.4, neon, 0, 0, 35); kotak(S, 0.4, 0.4, 60, neon, -35, 0, 5); kotak(S, 0.4, 0.4, 60, neon, 35, 0, 5);
-    // kota di sekeliling
-    for (let i = -6; i <= 6; i++) for (let j = -6; j <= 6; j++) {
-      if (Math.abs(i) <= 1 && Math.abs(j) <= 1) continue;
-      if (Math.random() < 0.15) continue;
-      const w = 10 + Math.random() * 8, h = 10 + Math.random() * 30;
-      gedungKota(S, w, h, w, i * 30 + Math.random() * 4, j * 30 + Math.random() * 4, 0.5);
-    }
-    // menara utama: 14 lantai, tiap lantai bisa diwarnai (untuk simulasi kebakaran)
-    v.lantai = [];
-    for (let f = 0; f < 14; f++) {
-      const t = teksturJendela(12, 3, 0.7, "#ffe2a8");
-      const m = kotak(S, 16, 5.6, 16, mat(0xffffff, { map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: 1.2, flatShading: false }), 0, f * 5.8, 0);
-      v.lantai.push(m);
-    }
-    kotak(S, 3, 82, 0.6, mat(0x22c55e, { emissive: 0x16a34a, emissiveIntensity: 0.6 }), 0, 0, 8.2);
-    const tiang = kotak(S, 0.5, 14, 0.5, 0xdc2626, 0, 81, 0);
-    // fasilitas
-    kotak(S, 12, 6, 8, 0x334155, 24, 0, 18); kotak(S, 12.2, 0.6, 8.2, neon, 24, 6, 18);
-    const genset = kotak(S, 9, 4, 5, 0x15803d, -24, 0, 18);
-    kotak(S, 8, 5, 3, 0xcbd5e1, -24, 0, 0);
-    tabung(S, 5, 5, 8, mat(0x1e3a8a, { emissive: 0x1e40af, emissiveIntensity: 0.4 }), 26, 0, -14);
-    kotak(S, 5, 3, 4, 0xdc2626, 14, 0, 30);
-    const akses = kotak(S, 6, 1.5, 3, mat(0x22d3ee, { emissive: 0x22d3ee, emissiveIntensity: 0.9 }), 0, 0, 14);
-    // lampu jalan
-    for (let i = -3; i <= 3; i++) for (const z of [-30, 40]) {
-      tabung(S, 0.2, 0.2, 7, 0x64748b, i * 12, 0, z, 6);
-      const b = new THREE.Mesh(new THREE.SphereGeometry(0.7, 8, 8), mat(0xfff1c1, { emissive: 0xfff1c1, emissiveIntensity: 1 }));
-      b.position.set(i * 12, 7.4, z); S.add(b);
-      const d = new THREE.Mesh(new THREE.CircleGeometry(5, 20), new THREE.MeshBasicMaterial({ color: 0xfff1c1, transparent: true, opacity: 0.12 }));
-      d.rotation.x = -Math.PI / 2; d.position.set(i * 12, 0.25, z); S.add(d);
-    }
-    label(v, "Fire Alarm", 0, 92, 0, () => (T.api ? { t: "ALARM Lt.8", off: true } : "Normal"));
-    label(v, "Suhu Lt.8", 6, 52, 6, () => (T.api ? { t: "68,4°C", off: true } : fmt(23.7 + rand(-0.1, 0.1), 1) + "°C"));
-    label(v, "Genset", -24, 7, 18, () => (T.padam || T.genset === "RUN" ? "RUN · 820 kW" : "Standby"));
-    label(v, "Okupansi", 0, 30, 8, () => fmt(311 + Math.round(rand(-3, 3))) + " org");
-    label(v, "LVMDP", -24, 8, 0, () => (T.padam ? "Suplai Genset" : fmt(1232 + Math.round(rand(-10, 10))) + " A"));
-    label(v, "Access Ctrl", 0, 4, 14, () => (T.akses ? "ON · 1244 scan" : { t: "OFF", off: true }));
-    label(v, "CCTV", -12, 10, 30, () => (T.cctv ? "47/48" : { t: "OFF", off: true }));
-    label(v, "Data Centre", 24, 9, 18, () => `${fmt(22.3, 1)}°C · PUE 1,42`);
-    label(v, "Pompa Fire", 14, 6, 30, () => (T.pompa ? "7,3 bar" : "Standby"));
-    label(v, "Tangki Air", 26, 11, -14, () => "87%");
-    v.preset = { Overview: [0.9, 0.95, 230, [0, 20, 0]], Tower: [1.2, 1.2, 120, [0, 40, 0]], Genset: [1.6, 0.9, 50, [-24, 0, 18]],
-      DC: [0.6, 0.9, 50, [24, 0, 18]], LVMDP: [1.9, 1.0, 50, [-24, 0, 0]], Pompa: [1.3, 0.9, 50, [14, 0, 30]] };
-    v.orbit.ke(v.preset.Overview);
-    // tombol kontrol
-    const renderKontrol = () => {
-      v.el.querySelectorAll("[data-tg]").forEach((e) => {
-        const k = e.dataset.tg, val = k === "genset" ? (T.padam || T.genset === "RUN" ? "RUN" : T.genset === "STOP" ? "STOP" : "STANDBY") : T[k] ? "ON" : "OFF";
-        e.textContent = val; e.classList.toggle("off", val === "OFF" || val === "STANDBY" || val === "STOP");
-      });
-      v.el.querySelectorAll("[data-sw]").forEach((b) => { const on = T[b.dataset.sw]; b.textContent = on ? "■ Stop" : "▶ Start"; b.className = "btn sm " + (on ? "red" : ""); });
-      v.el.querySelectorAll("[data-gm]").forEach((b) => b.classList.toggle("active", b.dataset.gm === T.genset));
-    };
-    v.el.querySelectorAll("[data-sw]").forEach((b) => (b.onclick = () => { T[b.dataset.sw] = !T[b.dataset.sw]; renderKontrol(); }));
-    v.el.querySelectorAll("[data-gm]").forEach((b) => (b.onclick = () => { T.genset = b.dataset.gm; renderKontrol(); }));
-    renderKontrol();
-    v.updaters.push((t) => {
-      const kedip = Math.sin(t / 150) > 0;
-      v.lantai.forEach((m, i) => {
-        const api = T.api && (i === 7 || i === 8);
-        m.material.emissive.set(api ? (kedip ? 0xff2020 : 0x661010) : 0xffffff);
-        m.material.emissiveIntensity = api ? 1.5 : T.padam ? 0.12 : T.lampu ? (v.malam ? 1.2 : 0.2) : 0.05;
-      });
-      tiang.material.emissive = new THREE.Color(kedip ? 0xff0000 : 0x000000);
-      genset.material.emissive = new THREE.Color(T.padam || T.genset === "RUN" ? (kedip ? 0x22c55e : 0x064e3b) : 0x000000);
-      akses.visible = T.akses;
-    });
-    v.detik = () => {
-      renderKontrol();
-      const set = (k, t) => (v.el.querySelector(`[data-k="${k}"]`).textContent = t);
-      set("beban", fmt(844 + rand(-10, 10)) + " kW"); set("okup", fmt(311 + Math.round(rand(-3, 3))) + " orang");
-      set("suhu", fmt(23.7 + rand(-0.1, 0.1), 1) + " °C"); set("alarm", T.alarm);
-      set("putus", (typeof tower !== "undefined" && tower.tenant.length ? tower.tenant.filter((x) => x.layanan.some((l) => l.status === "PUTUS")).length : 7) + " tenant");
-      set("log", `${jam()} ${T.log}`);
-      v.el.querySelector('[data-k="alarm"]').style.color = T.alarm ? "#f87171" : "";
-    };
-    return v;
-  }
-
-  /* ======================================================
      MODUL C — GROW PALM 3D (kebun sawit 100 hektar)
      ====================================================== */
   function scene_palm3d() {
@@ -800,7 +684,7 @@ const Scene3D = (() => {
     return v;
   }
 
-  const pembuat = { twin3d: scene_twin3d, tower3d: scene_tower3d, palm3d: scene_palm3d, power3d: scene_power3d, water3d: scene_water3d, solar3d: scene_solar3d };
+  const pembuat = { twin3d: scene_twin3d, palm3d: scene_palm3d, power3d: scene_power3d, water3d: scene_water3d, solar3d: scene_solar3d };
 
   /* ---------- Loop animasi (menggambar ulang ±60x per detik) ---------- */
   function loop(t) {
