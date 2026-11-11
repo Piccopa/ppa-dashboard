@@ -7,8 +7,9 @@
   <title>MITMAG SMART MONITORING SYSTEM</title>
   <link rel="icon" href="assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/atg.css">
 </head>
 <body>
 
@@ -27,7 +28,7 @@
         <button class="chip active" data-module="manufacture">🏭 Smart Manufacture</button>
         <button class="chip" data-module="tower">🏢 Smart Tower</button>
         <button class="chip" data-module="twin3d">🧊 3D Digital Twin</button>
-        <button class="chip" data-module="tower3d">🌃 3D Smart Tower</button>
+        <button class="chip" data-module="atg3d">🛢️ 3D ATG</button>
         <button class="chip" data-module="palm3d">🌴 Grow Palm 3D</button>
         <button class="chip" data-module="power3d">⚡ Power Plant 3D</button>
         <button class="chip" data-module="water3d">💧 Water Treatment 3D</button>
@@ -72,7 +73,7 @@
       <section class="module active" id="mod-manufacture"></section>
       <section class="module" id="mod-tower"></section>
       <section class="module" id="mod-twin3d"></section>
-      <section class="module" id="mod-tower3d"></section>
+      <section class="module" id="mod-atg3d"></section>
       <section class="module" id="mod-palm3d"></section>
       <section class="module" id="mod-power3d"></section>
       <section class="module" id="mod-water3d"></section>
@@ -93,5 +94,11 @@
   <script src="js/tower.js"></script>
   <script src="js/model3d.js"></script>
   <script src="js/scenes3d.js"></script>
+  <!-- Modul 3D Automatic Tank Gauge (urutan penting: hitung → data → alarm → 3D → tampilan) -->
+  <script src="js/atg/atg-calc.js"></script>
+  <script src="js/atg/atg-data.js"></script>
+  <script src="js/atg/atg-alarm.js"></script>
+  <script src="js/atg/atg-3d.js"></script>
+  <script src="js/atg/atg-ui.js"></script>
 </body>
 </html>
