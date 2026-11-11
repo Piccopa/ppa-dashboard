@@ -618,83 +618,10 @@ const Scene3D = (() => {
   }
 
   /* ======================================================
-     MODUL E — WATER TREATMENT 3D (IPA / WTP)
+     MODUL E — WATER TREATMENT 3D
+     Sekarang ada di file sendiri: js/wtp-scene.js (+ model di js/wtp3d.js)
+     File itu mendaftarkan diri lewat Scene3D.daftar("water3d", ...).
      ====================================================== */
-  function scene_water3d() {
-    const W = { intake: true, dosing: true, mixer: true, backwash: false, distribusi: true, level: 78 };
-    const unit = [["intake", "💧 Pompa Intake"], ["dosing", "🧪 Dosing Koagulan"], ["mixer", "🌀 Mixer Flokulasi"], ["backwash", "🔁 Backwash Filter"], ["distribusi", "🚰 Pompa Distribusi"]];
-    const v = kerangka("water3d", {
-      judul: `💧 Water Treatment 3D – ${CONFIG.namaSingkat} Water Treatment Plant`,
-      bar: { t1: CONFIG.namaSingkat.toUpperCase(), t1s: "WATER TREATMENT", t2: "Digital Twin 3D – Instalasi Pengolahan Air", t3: "Intake · Koagulasi · Flokulasi · Sedimentasi · Filtrasi · Reservoir · Distribusi" },
-      kiri: `${["masuk", "keluar", "ntu", "ph", "klor", "level"].map((k, i) => `<div class="v3-kv"><span>${["Debit Masuk", "Debit Keluar", "Kekeruhan", "pH", "Sisa Klor", "Level Reservoir"][i]}</span><b data-k="${k}">-</b></div>`).join("")}
-        <div data-k="log" class="muted" style="font-size:10.5px;margin-top:6px"></div>`,
-      kanan: `<h5>▮ Kontrol Proses</h5>${unit.map(([k, n]) => `<div class="v3-row"><span>${n}</span><span class="toggle" data-tg="${k}"></span><button class="btn sm" data-sw="${k}"></button></div>`).join("")}`,
-      bawah: [
-        ...["Overview", "Intake", "Koagulasi", "Sedimentasi", "Filtrasi", "Reservoir"].map((n) => ({ label: n, aksi: (v) => v.orbit.ke(v.preset[n]) })),
-        { label: "🔄 Auto-Rotate", aksi: (v, b) => { v.orbit.auto = !v.orbit.auto; b.classList.toggle("active", v.orbit.auto); } },
-        { label: "🔁 Simulasi Backwash", bahaya: true, aksi: () => { W.backwash = !W.backwash; toast(W.backwash ? "Backwash filter berjalan" : "Backwash selesai"); } },
-      ],
-    });
-    dunia3D(v, 0xd2e9f5);
-    v.langitSiang = 0xd2e9f5;
-    const S = v.scene;
-    kotak(S, 700, 1, 700, 0x9cc27f, 0, -1, 0);
-    kotak(S, 190, 0.3, 90, 0xd6d3d1, 0, -0.2, 0);
-    kotak(S, 30, 0.6, 400, 0x6a9bb0, -115, -0.4, 0);
-    const beton = 0xbfc3c7;
-    const air = (w, d, warna, x, y, z) => kotak(S, w, 0.2, d, mat(warna, { metalness: 0.2, roughness: 0.3 }), x, y, z);
-    const bak = (w, d, h, warna, x, z) => { kotak(S, w, h, d, beton, x, 0, z); return air(w - 1.2, d - 1.2, warna, x, h - 0.05, z); };
-    kotak(S, 8, 5, 8, 0x475569, -96, 0, 0);
-    bak(16, 16, 4, 0x8b6b3d, -70, 0);
-    const mixer = [];
-    for (let i = 0; i < 3; i++) { bak(10, 10, 4, 0x7a8a55, -50, -12 + i * 12); const m = kotak(S, 8, 0.4, 0.8, 0x1f2937, -50, 4.4, -12 + i * 12); mixer.push(m); }
-    const lengan = [];
-    [[-18, -15], [-18, 15]].forEach(([x, z]) => {
-      tabung(S, 13, 13, 4, beton, x, 0, z, 32);
-      const a = new THREE.Mesh(new THREE.CylinderGeometry(12.3, 12.3, 0.2, 32), mat(0x5f9ea0, { metalness: 0.2, roughness: 0.3 })); a.position.set(x, 4.05, z); S.add(a);
-      const g = new THREE.Group(); g.position.set(x, 4.6, z); kotak(g, 24, 0.8, 1.2, 0xf59e0b, 0, 0, 0); S.add(g); lengan.push(g);
-    });
-    const filter = [];
-    for (let i = 0; i < 6; i++) filter.push(bak(9, 9, 4, 0x3b82f6, 12 + (i % 3) * 11, -6 + Math.floor(i / 3) * 12));
-    const res = [tabung(S, 9, 9, 12, 0xe5e7eb, 62, 0, -12), tabung(S, 9, 9, 12, 0xe5e7eb, 62, 0, 12)];
-    kotak(S, 12, 6, 10, 0x1e40af, 85, 0, 0);
-    kotak(S, 24, 7, 12, 0xf1f5f9, 0, 0, -38); kotak(S, 24.2, 1, 12.2, 0x0ea5e9, 0, 6, -38);
-    // pipa
-    const pipa = (x1, z1, x2, z2) => { const p = tabung(S, 0.8, 0.8, Math.hypot(x2 - x1, z2 - z1), 0x2563eb, 0, 0, 0, 10); p.rotation.z = Math.PI / 2; p.rotation.y = -Math.atan2(z2 - z1, x2 - x1); p.position.set((x1 + x2) / 2, 1.4, (z1 + z2) / 2); };
-    pipa(-96, 0, -78, 0); pipa(-62, 0, -55, 0); pipa(-45, 0, -31, 0); pipa(-5, 0, 7, 0); pipa(45, 0, 53, 0); pipa(71, 0, 79, 0);
-    for (let i = 0; i < 40; i++) pohon(S, rand(-120, 140), Math.random() < 0.5 ? rand(-110, -55) : rand(50, 110), 1);
-    label(v, "Intake", -96, 7, 0, () => (W.intake ? fmt(rand(118, 122)) + " L/s" : { t: "OFF", off: true }));
-    label(v, "Koagulasi", -70, 6, 0, () => (W.dosing ? "PAC 28 mg/L" : { t: "Dosing OFF", off: true }));
-    label(v, "Flokulasi", -50, 6, 0, () => (W.mixer ? "G 45 s⁻¹" : { t: "OFF", off: true }));
-    label(v, "Sedimentasi", -18, 7, 0, () => fmt(rand(4, 5), 1) + " NTU");
-    label(v, "Filtrasi", 23, 6, 0, () => (W.backwash ? { t: "Backwash", off: true } : fmt(rand(0.3, 0.5), 2) + " NTU"));
-    label(v, "Reservoir", 62, 14, 0, () => fmt(W.level) + " %");
-    label(v, "Pompa Distribusi", 85, 8, 0, () => (W.distribusi ? "4,2 bar" : { t: "OFF", off: true }));
-    label(v, "Laboratorium", 0, 9, -38, () => "pH " + fmt(7.1, 1));
-    v.preset = { Overview: [1.0, 0.95, 180, [0, 0, 0]], Intake: [2.4, 0.9, 60, [-96, 0, 0]], Koagulasi: [1.4, 0.8, 70, [-60, 0, 0]], Sedimentasi: [1.2, 0.85, 80, [-18, 0, 0]], Filtrasi: [1.0, 0.85, 70, [23, 0, 0]], Reservoir: [0.6, 0.9, 70, [70, 0, 0]] };
-    v.orbit.ke(v.preset.Overview);
-    const renderKontrol = () => {
-      v.el.querySelectorAll("[data-tg]").forEach((e) => { const on = W[e.dataset.tg]; e.textContent = on ? "ON" : "OFF"; e.classList.toggle("off", !on); });
-      v.el.querySelectorAll("[data-sw]").forEach((b) => { const on = W[b.dataset.sw]; b.textContent = on ? "■ Stop" : "▶ Start"; b.className = "btn sm " + (on ? "red" : ""); });
-    };
-    v.el.querySelectorAll("[data-sw]").forEach((b) => (b.onclick = () => { W[b.dataset.sw] = !W[b.dataset.sw]; renderKontrol(); }));
-    renderKontrol();
-    v.updaters.push((t) => {
-      lengan.forEach((g) => (g.rotation.y = t / 4000));
-      mixer.forEach((m, i) => (m.rotation.y = W.mixer ? t / (300 + i * 80) : m.rotation.y));
-      filter.forEach((f) => f.material.color.set(W.backwash ? (Math.sin(t / 200) > 0 ? 0x8b6b3d : 0x3b82f6) : 0x3b82f6));
-    });
-    v.detik = () => {
-      renderKontrol();
-      W.level = Math.max(10, Math.min(98, W.level + (W.intake ? 0.15 : 0) - (W.distribusi ? 0.12 : 0)));
-      const set = (k, t) => (v.el.querySelector(`[data-k="${k}"]`).textContent = t);
-      set("masuk", W.intake ? fmt(rand(118, 122)) + " L/s" : "0 L/s"); set("keluar", W.distribusi ? fmt(rand(112, 116)) + " L/s" : "0 L/s");
-      set("ntu", W.dosing ? fmt(rand(0.3, 0.5), 2) + " NTU" : fmt(rand(6, 9), 1) + " NTU"); set("ph", fmt(rand(7.0, 7.2), 2));
-      set("klor", fmt(rand(0.4, 0.6), 2) + " mg/L"); set("level", fmt(W.level) + " %");
-      set("log", `${jam()} ${W.dosing ? "Kualitas air memenuhi baku mutu" : "⚠ Dosing mati – kekeruhan naik"}`);
-    };
-    return v;
-  }
 
   /* ======================================================
      MODUL F — SOLAR PLANT 3D (PLTS)
@@ -782,7 +709,7 @@ const Scene3D = (() => {
     return v;
   }
 
-  const pembuat = { twin3d: scene_twin3d, palm3d: scene_palm3d, power3d: scene_power3d, water3d: scene_water3d, solar3d: scene_solar3d };
+  const pembuat = { twin3d: scene_twin3d, palm3d: scene_palm3d, power3d: scene_power3d, solar3d: scene_solar3d };
 
   /* ---------- Loop animasi (menggambar ulang ±60x per detik) ---------- */
   function loop(t) {
@@ -807,9 +734,13 @@ const Scene3D = (() => {
         document.getElementById("mod-" + nama).innerHTML = `<div class="panel"><div class="panel-title">Modul 3D</div><p class="muted">Three.js belum termuat. Periksa koneksi internet, lalu muat ulang halaman (F5).</p></div>`;
         return;
       }
+      if (!pembuat[nama]) { toast("Modul 3D '" + nama + "' belum termuat – periksa tag <script> di index.html"); return; }
       try { views[nama] = pembuat[nama](); }
       catch (e) { console.error(e); toast("Gagal membuat 3D: " + e.message); }
     },
     aktifkan(nama) { aktif = nama; },
+    // Alat bantu untuk modul 3D yang ditulis di file terpisah (mis. js/wtp-scene.js)
+    alat: { kerangka, dunia3D, label, setMalam, kotak, tabung, pohon, mat },
+    daftar(nama, fungsi) { pembuat[nama] = fungsi; },
   };
 })();

@@ -7,15 +7,15 @@
 const CONFIG = {
   // ---- Identitas perusahaan ----
   namaSistem: "MITMAG SMART MONITORING SYSTEM",
-  subJudul: "Industrial Management System 4.0 · Provide by PT MITMAG",
-  namaPerusahaan: "PT PICCO PRIMA ARTHA",
+  subJudul: "Digital Twin Smart Manufacture 4.0 · Provide by PT MITMAG",
+  namaPerusahaan: "PT MITMAG",
   namaSingkat: "MITMAG",
 
   // ---- Kontak di footer (GANTI dengan data asli Anda) ----
-  telepon: "+62 851-1138-3882",
-  email: "sales@piccopa.co.id",
-  website: "www.piccopa.co.id",
-  namaPembuat: "Hage Sances Siregar",
+  telepon: "+62 000-0000-0000",
+  email: "email@perusahaan-anda.com",
+  website: "www.website-anda.com",
+  namaPembuat: "Nama Anda",
 };
 
 /* ---- Daftar peralatan di "Kontrol Peralatan" ----

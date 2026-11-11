@@ -325,3 +325,34 @@ canvas.trend { width: 100%; height: 190px; display: block; }
   .brand { min-width: 0; }
   .v3-panel { display: none; }
 }
+
+/* ---------- WATER TREATMENT 3D (js/wtp-scene.js) ---------- */
+.v3-panel.wtp { max-height: calc(100% - 190px); overflow-y: auto; }
+.v3-panel.wtp-kanan { width: 270px; }
+.v3-label.sek { border-color: #38bdf8; background: rgba(3, 37, 65, .92); font-size: 12px; transition: opacity .3s; }
+.v3-label.sek b { color: #7dd3fc; font-weight: 600; }
+.v3-label.tag { font-size: 9.5px; padding: 1px 5px; border-color: #64748b; line-height: 1.25; }
+.v3-label.tag div { color: #e2e8f0; }
+.v3-label.tag b { color: #a5f3fc; font-family: 'Share Tech Mono', monospace; }
+.v3-label.tag.alm { border-color: #ef4444; background: rgba(127, 29, 29, .9); animation: wtpKedip 1s infinite; }
+.v3-label.tag.alm b { color: #fecaca; }
+@keyframes wtpKedip { 50% { box-shadow: 0 0 0 4px rgba(239, 68, 68, .35); } }
+.wtp-sek { display: flex; gap: 3px; margin-bottom: 6px; }
+.wtp-sek .btn { flex: 1; padding: 3px 0; }
+.wtp-sek .btn.active { background: var(--accent); border-color: var(--accent); color: #04121f; font-weight: 700; }
+.wtp-tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+.wtp-tbl td { padding: 3px 2px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.wtp-tbl td small { display: block; color: var(--muted); font-size: 9.5px; }
+.wtp-tbl td.v { text-align: right; font-family: 'Share Tech Mono', monospace; color: var(--accent); white-space: nowrap; font-size: 11.5px; }
+.wtp-tbl tr { cursor: pointer; }
+.wtp-tbl tr:hover, .wtp-tbl tr.fokus { background: rgba(56, 189, 248, .1); }
+.wtp-tbl tr.alm td.v { color: #f87171; }
+.dotst { display: inline-block; min-width: 24px; text-align: center; padding: 1px 3px; border-radius: 3px; font-size: 9px; font-weight: 700; }
+.dotst.N { background: #14532d; color: #86efac; }
+.dotst.H, .dotst.L { background: #78350f; color: #fcd34d; }
+.dotst.HH, .dotst.LL { background: #7f1d1d; color: #fecaca; }
+.wtp-alm { margin-top: 6px; padding: 5px 7px; border-radius: 5px; background: #052e1a; color: #86efac; font-weight: 700; font-size: 11px; }
+.wtp-alm.on { background: #450a0a; color: #fca5a5; animation: wtpKedip 1.2s infinite; }
+.wtp-almrow { font-size: 10px; padding: 2px 4px; cursor: pointer; color: #fecaca; border-bottom: 1px dashed #7f1d1d; }
+.wtp-log div { font-size: 10px; padding: 2px 0; border-bottom: 1px dashed var(--border); line-height: 1.3; }
+.v3-panel.left.wtp { width: 238px; }
