@@ -184,7 +184,7 @@ const Scene3D = (() => {
     const v = kerangka("twin3d", {
       judul: `🧊 3D Digital Twin – ${CONFIG.namaSingkat} Smart Manufacture`,
       tombolAtas: [
-        ...["Overview", "Pabrik", "Utilitas", "Pelabuhan", "Laut", "Kawasan", "Logistik"].map((n) => ({ label: n, aksi: (v) => v.orbit.ke(v.preset[n]) })),
+        ...["Overview", "Pabrik", "Utilitas", "Kantor", "Pelabuhan", "Laut", "Kawasan", "Logistik"].map((n) => ({ label: n, aksi: (v) => v.orbit.ke(v.preset[n]) })),
         { label: "🌞 Siang", aksi: (v, b) => { setMalam(v, !v.malam); b.textContent = v.malam ? "🌙 Malam" : "🌞 Siang"; } },
         { label: "🔄 Auto Orbit", aksi: (v, b) => { v.orbit.auto = !v.orbit.auto; b.classList.toggle("active", v.orbit.auto); } },
       ],
@@ -193,86 +193,112 @@ const Scene3D = (() => {
     dunia3D(v, 0xcfe8f7);
     v.langitSiang = 0xcfe8f7;
     const S = v.scene;
-    // tanah, laut, pantai, gunung
-    kotak(S, 600, 1, 600, 0xc9cfbb, 0, -1, 0);
-    kotak(S, 300, 0.3, 600, 0x3fb4e0, -230, 0.02, 0);
-    kotak(S, 14, 0.3, 600, 0xe8dcb5, -76, 0.04, 0);
+    // ---------- tanah, laut bergelombang, pantai, dermaga, gunung ----------
+    kotak(S, 600, 1, 600, 0xb9c4a6, 0, -1, 0);
+    const laut = Model3D.laut(300, 600);                 // laut realistis (js/model3d.js)
+    laut.position.set(-230, 0.8, 0); S.add(laut);
+    kotak(S, 14, 0.9, 600, 0xe8dcb5, -76, 0, 0);         // pantai
+    kotak(S, 26, 1.3, 64, 0xa8adb3, -72, 0, 50);         // dermaga beton (pelabuhan)
     for (let i = 0; i < 9; i++) {
       const g = new THREE.Mesh(new THREE.ConeGeometry(60 + Math.random() * 40, 70 + Math.random() * 50, 6), mat(0x8fbf8a));
       g.position.set(-40 + i * 50, 30, -230 - Math.random() * 40); S.add(g);
     }
-    // jalan
+    // ---------- jalan ----------
     kotak(S, 220, 0.2, 9, 0x4b5563, 30, 0, 26);
     kotak(S, 9, 0.2, 160, 0x4b5563, 74, 0, 0);
     for (let x = -75; x < 140; x += 8) kotak(S, 3, 0.25, 0.4, 0xffffff, x, 0, 26);
-    // gedung pabrik
-    const pabrik = kotak(S, 52, 12, 26, 0xe5e7eb, 12, 0, -10);
-    kotak(S, 52.2, 1.6, 26.2, 0x2563eb, 12, 8, -10);
-    kotak(S, 52, 1, 26, 0x9ca3af, 12, 12, -10);
-    kotak(S, 30, 10, 20, 0xe5e7eb, 52, 0, -14); kotak(S, 30.2, 1.6, 20.2, 0xdc2626, 52, 6.5, -14);
-    kotak(S, 22, 9, 16, 0xcbd5e1, -26, 0, -12); kotak(S, 22.2, 1.4, 16.2, 0x16a34a, -26, 6, -12);
-    // atap utilitas: chiller & AHU
-    kotak(S, 7, 3, 5, 0x60a5fa, -31, 9, -14); kotak(S, 7, 3, 5, 0xe2e8f0, -22, 9, -14);
-    // gudang logistik
-    kotak(S, 36, 10, 22, 0x9ca3af, 100, 0, 2); kotak(S, 36.2, 2, 22.2, 0x7c3aed, 100, 7, 2);
+    // ---------- gedung-gedung nyata (js/model3d.js) ----------
+    const pabrik = Model3D.pabrik({ lebar: 52, dalam: 26, tinggi: 12, pita: 0x2563eb, nama: CONFIG.namaSingkat });
+    pabrik.position.set(12, 0, -10); S.add(pabrik);
+    const hall2 = Model3D.pabrik({ lebar: 28, dalam: 20, tinggi: 10, pita: 0xdc2626, nama: "HALL 2" });
+    hall2.position.set(54, 0, -14); S.add(hall2);
+    const utilitas = Model3D.pabrik({ lebar: 22, dalam: 16, tinggi: 9, pita: 0x16a34a, nama: "UTILITAS" });
+    utilitas.position.set(-26, 0, -14); S.add(utilitas);
+    const gudang = Model3D.pabrik({ lebar: 36, dalam: 22, tinggi: 10, pita: 0x7c3aed, nama: "LOGISTIK" });
+    gudang.position.set(100, 0, 2); S.add(gudang);
+    // kantor pusat & kantor kedua di belakang pabrik (menjulang di latar)
+    const kantor = Model3D.kantor({ lebar: 18, dalam: 14, tinggi: 42, nama: CONFIG.namaSingkat });
+    kantor.position.set(40, 0, -54); S.add(kantor);
+    const kantor2 = Model3D.kantor({ lebar: 14, dalam: 12, tinggi: 26, kaca: 0x3b7f8f, nama: CONFIG.namaSingkat });
+    kantor2.position.set(62, 0, -52); S.add(kantor2);
+    kotak(S, 46, 0.15, 8, 0x374151, 50, 0, -37);          // parkiran
+    for (let x = 30; x <= 70; x += 4) kotak(S, 0.2, 0.18, 6, 0xffffff, x, 0, -37);
+    // chiller & AHU di samping gedung utilitas
+    kotak(S, 7, 3, 5, 0x60a5fa, -30, 0, 2); kotak(S, 7, 3, 5, 0xe2e8f0, -21, 0, 2);
     // tangki & cerobong
-    tabung(S, 4, 4, 10, 0xf8fafc, -45, 0, -24); tabung(S, 4, 4, 10, 0xf8fafc, -45, 0, -12); tabung(S, 3, 3, 8, 0xf97316, -38, 0, 0);
+    tabung(S, 4, 4, 10, 0xf8fafc, -45, 0, -24); tabung(S, 4, 4, 10, 0xf8fafc, -45, 0, -12); tabung(S, 3, 3, 8, 0xf97316, -40, 0, 2);
     for (let i = 0; i < 6; i++) tabung(S, 1.6, 1.8, 5, i % 2 ? 0xffffff : 0xdc2626, -34, i * 5, -30, 12);
     // genset & baterai & LVMDP (di luar gedung)
     kotak(S, 8, 4, 4, 0x10b981, -8, 0, 10); kotak(S, 6, 5, 3, 0x1f2937, 2, 0, 10); kotak(S, 8, 5, 2.5, 0xe2e8f0, 12, 0, 10);
-    // pelabuhan: kontainer & crane
-    const warnaKont = [0xef4444, 0x22c55e, 0xeab308, 0x3b82f6, 0xf97316, 0x14b8a6, 0xffffff];
+    // ---------- pelabuhan: lapangan kontainer & crane ----------
+    const warnaKont = [0xb91c1c, 0x15803d, 0xd97706, 0x1d4ed8, 0x9a3412, 0x0f766e, 0xe2e8f0];
     for (let i = 0; i < 6; i++) for (let j = 0; j < 4; j++) for (let k = 0; k < 1 + ((i + j) % 3); k++)
-      kotak(S, 5.5, 2.6, 2.4, warnaKont[(i * 3 + j + k) % 7], -62 + i * 6, k * 2.6, 40 + j * 2.8);
-    kotak(S, 1.5, 22, 1.5, 0xeab308, -70, 0, 38); kotak(S, 1.5, 22, 1.5, 0xeab308, -70, 0, 54); kotak(S, 28, 1.8, 2, 0xeab308, -78, 21, 46);
-    // kapal (bergerak)
-    const kapal = new THREE.Group();
-    kotak(kapal, 36, 4, 9, 0x1e3a8a, 0, 0, 0); kotak(kapal, 6, 6, 8, 0xffffff, 14, 4, 0);
-    for (let i = 0; i < 5; i++) kotak(kapal, 5, 2.4, 7, warnaKont[i], -12 + i * 5.2, 4, 0);
-    kapal.position.set(-120, 0.3, 0); S.add(kapal);
-    const perahu = kotak(S, 4, 2, 2, 0xdc2626, -100, 0.3, -40);
-    // truk (bergerak di jalan)
-    const truk = [0, 1, 2, 3].map((i) => {
-      const g = new THREE.Group();
-      kotak(g, 7, 3, 3, [0xffffff, 0x3b82f6, 0xf97316, 0x22c55e][i], 0, 0.4, 0); kotak(g, 2.5, 2.6, 3, 0x1f2937, 4.6, 0.4, 0);
-      g.userData = { off: i * 60, arah: i % 2 ? 1 : -1 }; S.add(g); return g;
+      kotak(S, 5.5, 2.6, 2.4, warnaKont[(i * 3 + j + k) % 7], -55 + i * 6, 1.3 + k * 2.6, 40 + j * 2.8);
+    [[-66, 30], [-66, 44], [-78, 30], [-78, 44]].forEach(([x, z]) => kotak(S, 1.2, 24, 1.2, 0xeab308, x, 1.3, z));
+    kotak(S, 40, 1.8, 2, 0xeab308, -82, 23, 37); kotak(S, 14, 3, 4, 0xeab308, -72, 21, 37);
+    // ---------- kapal kargo: satu berlayar, satu bersandar ----------
+    const kapal = Model3D.kapal();
+    kapal.rotation.y = -Math.PI / 2;                    // haluan menghadap +z (arah berlayar)
+    kapal.position.set(-150, 0.8, 0); S.add(kapal);
+    const kapalSandar = Model3D.kapal({ tulisan: "MITMAG EXPRESS", warnaLambung: 0x7f1d1d, isi: 1 });
+    kapalSandar.rotation.y = -Math.PI / 2;
+    kapalSandar.position.set(-93, 0.8, 50); S.add(kapalSandar);
+    const perahu = kotak(S, 4, 2, 2, 0xdc2626, -110, 0.8, -60);
+    // ---------- truk realistis (bergerak di jalan, roda berputar) ----------
+    const varian = [{ warnaMuatan: 0x1d4ed8 }, { jenis: "tangki", warnaKabin: 0xdc2626 }, { warnaMuatan: 0xd97706, warnaKabin: 0x1f2937 }, { warnaMuatan: 0x15803d }];
+    const truk = varian.map((opsi, i) => {
+      const g = Model3D.truk(opsi);
+      g.scale.setScalar(0.75);
+      g.userData.off = i * 55; g.userData.arah = i % 2 ? 1 : -1;
+      S.add(g); return g;
     });
-    // pohon
+    // ---------- pohon (tidak di area pelabuhan & kantor) ----------
     for (let i = 0; i < 110; i++) {
       const x = -70 + Math.random() * 200, z = (Math.random() < 0.5 ? -40 - Math.random() * 90 : 34 + Math.random() * 80);
-      if (x > -70 && x < -35 && z > 30) continue;
+      if (x < -35 && z > 30) continue;
+      if (x > 24 && x < 78 && z > -72 && z < -28) continue;
       pohon(S, x, z, 0.8 + Math.random() * 0.6);
     }
     // label peralatan (klik → start/stop, terhubung dengan modul Smart Manufacture)
     const st = state.sensor, on = state.alat;
     const L = (id, judul, x, y, z, f) => label(v, judul, x, y, z, () => (on[id] ? { t: f() } : { t: "OFF", off: true }), () => setAlat(id, !on[id]));
-    L("lighting", "Lighting", 0, 16, -10, () => "Normal");
-    label(v, "Lini Produksi", 14, 14, -6, () => fmt(state.produksi) + " unit");
-    L("chiller", "Chiller", -31, 14, -14, () => fmt(6.1, 1) + " °C");
-    L("ahu", "AHU", -22, 15, -14, () => fmt(st.suhu, 1) + " °C");
-    L("hvac", "HVAC", 52, 13, -14, () => fmt(st.suhu - 0.5, 1) + " °C");
-    L("boiler", "Boiler", -38, 10, 0, () => "Gas " + fmt(st.gas) + " m³");
+    L("lighting", "Lighting", 0, 19, -10, () => "Normal");
+    label(v, "Lini Produksi", 18, 18, -4, () => fmt(state.produksi) + " unit");
+    L("chiller", "Chiller", -30, 6, 2, () => fmt(6.1, 1) + " °C");
+    L("ahu", "AHU", -21, 6, 2, () => fmt(st.suhu, 1) + " °C");
+    L("hvac", "HVAC", 54, 15, -14, () => fmt(st.suhu - 0.5, 1) + " °C");
+    L("boiler", "Boiler", -40, 10, 2, () => "Gas " + fmt(st.gas) + " m³");
     L("genset", "Genset", -8, 6, 10, () => fmt(st.tgenset, 1) + " bar");
     L("battery", "Battery/Aki", 2, 7, 10, () => fmt(st.aki, 1) + " V");
     L("lvmdp", "LVMDP", 12, 7, 10, () => fmt(381) + " V");
     L("valve", "Control Valve", -45, 12, -12, () => fmt(st.valve) + "% buka");
-    L("power", "Power Meter", 24, 14, -2, () => fmt(st.power, 1) + " kWh");
+    L("power", "Power Meter", 30, 16, -2, () => fmt(st.power, 1) + " kWh");
     L("pompa", "Pompa", -45, 12, -24, () => fmt(st.tpompa, 1) + " bar");
-    L("flow", "Flow Meter", 40, 12, -6, () => fmt(st.flow) + " m³/h");
+    L("flow", "Flow Meter", 46, 12, -4, () => fmt(st.flow) + " m³/h");
+    label(v, "Kantor Pusat", 40, 47, -54, () => fmt(186 + Math.round(rand(-3, 3))) + " orang");
+    const lblKapal = label(v, "MV MITMAG LINE", 0, 30, 0, () => "Berlayar · 1.240 TEU");
+    label(v, "MV MITMAG EXPRESS", -93, 30, 50, () => "Bongkar muat · " + fmt(612 + Math.round(rand(0, 4))) + " TEU");
     v.preset = {
-      Overview: [1.15, 1.0, 190, [0, 0, 5]], Pabrik: [1.1, 0.95, 90, [12, 0, -10]], Utilitas: [0.5, 0.9, 70, [-30, 0, -12]],
-      Pelabuhan: [2.0, 0.9, 90, [-60, 0, 45]], Laut: [2.6, 1.15, 160, [-140, 0, 0]], Kawasan: [0.9, 0.6, 330, [10, 0, 0]], Logistik: [0.3, 0.9, 90, [95, 0, 5]],
+      Overview: [1.15, 1.0, 190, [0, 0, 5]], Pabrik: [1.1, 0.95, 90, [12, 0, -10]], Utilitas: [0.5, 0.9, 70, [-30, 0, -8]],
+      Kantor: [1.25, 0.95, 100, [50, 18, -50]], Pelabuhan: [2.3, 0.95, 120, [-80, 0, 45]], Laut: [2.6, 1.1, 200, [-140, 0, 0]],
+      Kawasan: [0.9, 0.6, 330, [10, 0, 0]], Logistik: [0.3, 0.9, 90, [95, 0, 5]],
     };
     v.orbit.ke(v.preset.Overview);
-    v.onMalam = (m) => { pabrik.material.emissive = new THREE.Color(m ? 0x334155 : 0x000000); };
     const t0 = performance.now();
     v.updaters.push((t) => {
-      kapal.position.z = ((t - t0) / 90) % 400 - 200;
-      perahu.position.x = -100 + Math.sin(t / 3000) * 20;
+      laut.userData.gerak(t / 1000);                                    // ombak
+      kapal.position.z = ((t - t0) / 70) % 500 - 250;                   // kapal berlayar
+      kapal.position.y = 0.8 + Math.sin(t / 900) * 0.25;               // naik-turun di ombak
+      kapal.rotation.z = Math.sin(t / 1300) * 0.01;
+      kapalSandar.position.y = 0.8 + Math.sin(t / 1100) * 0.12;
+      lblKapal.pos.set(kapal.position.x, 30, kapal.position.z);
+      perahu.position.x = -110 + Math.sin(t / 3000) * 20;
       truk.forEach((g) => {
-        const u = (((t / 40) * g.userData.arah + g.userData.off) % 220 + 220) % 220;
-        g.position.set(-75 + u, 0, 26 + (g.userData.arah > 0 ? 2 : -2));
+        const jarak = t / 40 + g.userData.off;
+        const u = ((jarak * g.userData.arah) % 220 + 220) % 220;
+        g.position.set(-75 + u, 0, 26 + (g.userData.arah > 0 ? 2.2 : -2.2));
         g.rotation.y = g.userData.arah > 0 ? 0 : Math.PI;
+        g.userData.roda.forEach((r) => (r.rotation.z = -jarak / 0.75 / 0.52));   // roda berputar sesuai jarak tempuh
       });
     });
     v.detik = () => {
