@@ -539,92 +539,12 @@ const Scene3D = (() => {
      ====================================================== */
 
   /* ======================================================
-     MODUL F — SOLAR PLANT 3D (PLTS)
+     MODUL F — SOLAR PLANT 3D
+     Sekarang memakai aplikasi lengkap di folder Green_Power_Plant/
+     (dibuka lewat iframe oleh js/app.js), jadi tidak dibuat di sini.
      ====================================================== */
-  function scene_solar3d() {
-    const P = { inv1: true, inv2: true, inv3: true, inv4: true, tracker: true, awan: false, kwh: 3.42 };
-    const unit = [["inv1", "⚡ Inverter 1"], ["inv2", "⚡ Inverter 2"], ["inv3", "⚡ Inverter 3"], ["inv4", "⚡ Inverter 4"], ["tracker", "🧭 Solar Tracker"]];
-    const v = kerangka("solar3d", {
-      judul: `🌞 Solar Plant 3D – ${CONFIG.namaSingkat} Solar Plant`,
-      bar: { t1: CONFIG.namaSingkat.toUpperCase(), t1s: "SOLAR PLANT", t2: "Digital Twin 3D – PLTS 2 MWp", t3: "PV Array · Inverter · Tracker · Gardu · Cuaca" },
-      kiri: `${["kw", "mwh", "irr", "tpanel", "pr"].map((k, i) => `<div class="v3-kv"><span>${["Daya PV", "Energi Hari Ini", "Iradiasi", "Suhu Panel", "Performance Ratio"][i]}</span><b data-k="${k}">-</b></div>`).join("")}
-        <div data-k="log" class="muted" style="font-size:10.5px;margin-top:6px"></div>`,
-      kanan: `<h5>▮ Kontrol PLTS</h5>${unit.map(([k, n]) => `<div class="v3-row"><span>${n}</span><span class="toggle" data-tg="${k}"></span><button class="btn sm" data-sw="${k}"></button></div>`).join("")}`,
-      bawah: [
-        ...["Overview", "Array A", "Array B", "Inverter", "Gardu"].map((n) => ({ label: n, aksi: (v) => v.orbit.ke(v.preset[n]) })),
-        { label: "🔄 Auto-Rotate", aksi: (v, b) => { v.orbit.auto = !v.orbit.auto; b.classList.toggle("active", v.orbit.auto); } },
-        { label: "☁️ Simulasi Awan", bahaya: true, aksi: () => { P.awan = !P.awan; toast(P.awan ? "Awan tebal – iradiasi turun" : "Cerah kembali"); } },
-      ],
-    });
-    dunia3D(v, 0xa9d4f5);
-    v.langitSiang = 0xa9d4f5;
-    const S = v.scene;
-    kotak(S, 700, 1, 700, 0x8fbf5f, 0, -1, 0);
-    kotak(S, 170, 0.3, 120, 0xb9c29a, 0, -0.2, 0);
-    // panel surya: 4 array × 8 baris × 20 panel
-    const N = 4 * 8 * 20;
-    const panel = new THREE.InstancedMesh(new THREE.BoxGeometry(3.2, 0.15, 2), mat(0x1e3a8a, { metalness: 0.6, roughness: 0.25, flatShading: false }), N);
-    const kaki = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.1, 0.1, 1.6, 4), mat(0x9ca3af), N);
-    panel.castShadow = true; S.add(panel, kaki);
-    const posPanel = [];
-    for (let a = 0; a < 4; a++) for (let r = 0; r < 8; r++) for (let c = 0; c < 20; c++) {
-      posPanel.push([(a % 2 ? 8 : -72) + c * 3.4, (a < 2 ? -48 : 8) + r * 5]);
-    }
-    const dm = new THREE.Object3D();
-    posPanel.forEach(([x, z], i) => { dm.position.set(x, 0.8, z); dm.rotation.set(0, 0, 0); dm.updateMatrix(); kaki.setMatrixAt(i, dm.matrix); });
-    function aturPanel(sudut) {
-      posPanel.forEach(([x, z], i) => { dm.position.set(x, 1.7, z); dm.rotation.set(-0.35, 0, sudut); dm.updateMatrix(); panel.setMatrixAt(i, dm.matrix); });
-      panel.instanceMatrix.needsUpdate = true;
-    }
-    aturPanel(0);
-    const inv = [0, 1, 2, 3].map((i) => kotak(S, 3, 3, 2, 0xe5e7eb, -10 + i * 6, 0, -4));
-    kotak(S, 10, 6, 8, 0x475569, 74, 0, -2); tabung(S, 1.5, 1.5, 4, 0x94a3b8, 74, 6, -2, 8);
-    kotak(S, 170, 2, 0.2, 0x6b7280, 0, 0, -62); kotak(S, 170, 2, 0.2, 0x6b7280, 0, 0, 58);
-    const matahari = new THREE.Mesh(new THREE.SphereGeometry(8, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfff1a8 }));
-    S.add(matahari);
-    const awan = new THREE.Group();
-    for (let i = 0; i < 6; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(10 + Math.random() * 6, 10, 10), new THREE.MeshLambertMaterial({ color: 0xf1f5f9, transparent: true, opacity: 0.9 })); m.position.set(i * 12 - 30, Math.random() * 5, Math.random() * 10); awan.add(m); }
-    awan.position.set(0, 70, 0); S.add(awan);
-    for (let i = 0; i < 50; i++) pohon(S, rand(-150, 150), Math.random() < 0.5 ? rand(-130, -70) : rand(66, 130), 1.1);
-    label(v, "Array A", -40, 6, -30, () => (P.inv1 ? fmt(kwArray(), 0) + " kW" : { t: "OFF", off: true }));
-    label(v, "Array B", 40, 6, -30, () => (P.inv2 ? fmt(kwArray(), 0) + " kW" : { t: "OFF", off: true }));
-    label(v, "Array C", -40, 6, 26, () => (P.inv3 ? fmt(kwArray(), 0) + " kW" : { t: "OFF", off: true }));
-    label(v, "Array D", 40, 6, 26, () => (P.inv4 ? fmt(kwArray(), 0) + " kW" : { t: "OFF", off: true }));
-    label(v, "Inverter", -1, 5, -4, () => [P.inv1, P.inv2, P.inv3, P.inv4].filter(Boolean).length + "/4 ON");
-    label(v, "Gardu 20 kV", 74, 12, -2, () => fmt(kwTotal() / 1000, 2) + " MW");
-    const irr = () => (P.awan ? 220 : 880) + rand(-15, 15);
-    const kwArray = () => (irr() / 1000) * 500 * (P.tracker ? 1 : 0.86);
-    const kwTotal = () => [P.inv1, P.inv2, P.inv3, P.inv4].filter(Boolean).length * kwArray();
-    v.preset = { Overview: [1.0, 0.9, 200, [0, 0, 0]], "Array A": [1.2, 0.8, 70, [-40, 0, -30]], "Array B": [0.6, 0.8, 70, [40, 0, -30]], Inverter: [1.5, 0.9, 40, [-1, 0, -4]], Gardu: [0.4, 0.9, 50, [74, 0, -2]] };
-    v.orbit.ke(v.preset.Overview);
-    const renderKontrol = () => {
-      v.el.querySelectorAll("[data-tg]").forEach((e) => { const on = P[e.dataset.tg]; e.textContent = on ? "ON" : "OFF"; e.classList.toggle("off", !on); });
-      v.el.querySelectorAll("[data-sw]").forEach((b) => { const on = P[b.dataset.sw]; b.textContent = on ? "■ Stop" : "▶ Start"; b.className = "btn sm " + (on ? "red" : ""); });
-      inv.forEach((m, i) => (m.material.emissive = new THREE.Color(P["inv" + (i + 1)] ? 0x14532d : 0x7f1d1d)));
-    };
-    v.el.querySelectorAll("[data-sw]").forEach((b) => (b.onclick = () => { P[b.dataset.sw] = !P[b.dataset.sw]; renderKontrol(); }));
-    renderKontrol();
-    let frame = 0;
-    v.updaters.push((t) => {
-      const sudut = Math.sin(t / 20000) * 0.9;
-      matahari.position.set(Math.sin(sudut) * 200, Math.cos(sudut) * 170, -120);
-      v.sun.position.copy(matahari.position);
-      v.sun.intensity = P.awan ? 0.3 : 0.75;
-      awan.position.x = ((t / 80) % 400) - 200; awan.visible = P.awan;
-      if (frame++ % 10 === 0) aturPanel(P.tracker ? -sudut * 0.8 : 0);
-    });
-    v.detik = () => {
-      renderKontrol();
-      const kw = kwTotal(); P.kwh += kw / 3600 / 1000;
-      const set = (k, t) => (v.el.querySelector(`[data-k="${k}"]`).textContent = t);
-      set("kw", fmt(kw) + " kW"); set("mwh", fmt(P.kwh, 2) + " MWh"); set("irr", fmt(irr()) + " W/m²");
-      set("tpanel", fmt(P.awan ? 34 : 47 + rand(-0.5, 0.5), 1) + " °C"); set("pr", fmt(P.tracker ? 82.4 : 78.1, 1) + " %");
-      set("log", `${jam()} ${P.awan ? "⚠ Iradiasi rendah – produksi turun" : "Produksi optimal"}`);
-    };
-    return v;
-  }
 
-  const pembuat = { twin3d: scene_twin3d, palm3d: scene_palm3d, solar3d: scene_solar3d };
+  const pembuat = { twin3d: scene_twin3d, palm3d: scene_palm3d };
 
   /* ---------- Loop animasi (menggambar ulang ±60x per detik) ---------- */
   function loop(t) {

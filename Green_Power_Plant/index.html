@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Green Energy Solar Power Plant Monitoring System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/gp.css" />
+</head>
+<body>
+  <!-- ================= HEADER ================= -->
+  <header class="hdr">
+    <button id="menuBtn" class="btn ikon" title="Menu">☰</button>
+    <div class="brand">
+      <svg viewBox="0 0 64 64" class="logo" aria-hidden="true">
+        <circle cx="40" cy="22" r="11" fill="#facc15"/>
+        <g stroke="#facc15" stroke-width="3" stroke-linecap="round"><line x1="40" y1="4" x2="40" y2="8"/><line x1="56" y1="22" x2="60" y2="22"/><line x1="52" y1="10" x2="55" y2="7"/><line x1="52" y1="34" x2="55" y2="37"/></g>
+        <path d="M6 58 C6 30 24 18 44 22 C40 44 26 56 6 58 Z" fill="#22c55e"/><path d="M9 55 C18 44 26 36 38 28" stroke="#14532d" stroke-width="2.5" fill="none"/>
+      </svg>
+      <div><h1>GREEN ENERGY SOLAR POWER PLANT MONITORING SYSTEM</h1><p>3D RENEWABLE ENERGY GENERATION &amp; DISTRIBUTION MANAGEMENT</p></div>
+    </div>
+    <div class="hdr-r">
+      <span class="sim-badge" title="Semua nilai adalah data simulasi, bukan pengukuran nyata">● SIMULATION</span>
+      <span class="mode-badge" id="hdrMode">EMS</span>
+      <div class="clock"><small>SIM TIME</small><b id="simJam">--:--:--</b><span id="simTgl"></span></div>
+      <label class="spd"><small>SPEED</small><select id="speed"><option value="1">1× (real)</option><option value="10">10×</option><option value="60">60×</option><option value="300">300×</option></select></label>
+      <div class="clock real"><small>LOCAL</small><b id="realJam">--:--:--</b></div>
+      <button id="almBtn" class="alm-sum" title="Alarm aktif"><span class="c-crit" id="ac_crit">0</span><span class="c-warn" id="ac_warn">0</span><span class="c-comm" id="ac_comm">0</span></button>
+    </div>
+  </header>
+
+  <!-- ================= MENU + HALAMAN ================= -->
+  <div class="wrap">
+    <nav id="nav"></nav>
+    <main id="main"></main>
+  </div>
+
+  <!-- ================= BANNER ALARM & MODAL ================= -->
+  <footer class="alm-banner" id="banner"></footer>
+  <div id="modal"></div>
+
+  <!-- Library (butuh internet saat pertama dibuka) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Kode aplikasi (urutan penting) -->
+  <script src="js/config.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/sim.js"></script>
+  <script src="js/datasource.js"></script>
+  <script src="js/alarms.js"></script>
+  <script src="js/scene3d.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/logger.js"></script>
+  <script src="js/pages.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

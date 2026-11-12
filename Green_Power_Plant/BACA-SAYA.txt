@@ -1,0 +1,32 @@
+GREEN ENERGY SOLAR POWER PLANT MONITORING SYSTEM
+3D Renewable Energy Generation & Distribution Management
+=================================================================
+
+SEMUA DATA DI APLIKASI INI ADALAH SIMULASI (SIMULATION), BUKAN PENGUKURAN ASLI.
+
+CARA MENJALANKAN DI XAMPP
+1. Salin folder "Green_Power_Plant" ke:  C:\xampp\htdocs\Green_Power_Plant\
+2. Jalankan Apache dari XAMPP Control Panel.
+3. Buka browser:  http://localhost/Green_Power_Plant/
+   (file yang dibuka otomatis adalah index.html)
+
+Komputer harus tersambung internet saat membuka halaman, karena
+Three.js (3D) dan Chart.js (grafik) diambil dari CDN.
+
+ISI FOLDER
+  index.html          halaman utama (15 menu)
+  css/gp.css          tampilan (warna, tata letak)
+  js/config.js        kapasitas peralatan (kWp, kWh baterai, kVA genset, dll.) - ubah di sini
+  js/sim.js           mesin simulasi (cuaca, PV, inverter, BESS, genset, BBM, beban, EMS)
+  js/datasource.js    titik sambung untuk data asli (Modbus / PLC / BMS / SCADA)
+  js/alarms.js        daftar alarm & event
+  js/scene3d.js       kampus 3D (PLTS, BESS, genset, gardu, pabrik, perumahan, taman, pepohonan)
+  js/charts.js        grafik tren (Chart.js)
+  js/logger.js        data logger, ekspor CSV / Excel
+  js/pages.js         isi tiap menu
+  js/app.js           navigasi & tombol
+
+DATA TERSIMPAN
+Riwayat (log, harian, bulanan, BBM, alarm, event) disimpan di browser
+(localStorage, awalan "gp-"). Tombol "Reset simulasi" di menu Data Logger
+menghapus dan membuat ulang data simulasi.

@@ -41,10 +41,30 @@ function bukaModul(nama) {
     sudahDibuka[nama] = true;
     if (nama === "tower") buatSmartTower();
     else if (nama === "atg3d") ATG_UI.buka();                     // halaman 3D Automatic Tank Gauge
+    else if (nama === "solar3d") buatGreenPower();                // aplikasi Green Power Plant (iframe)
     else if (nama !== "manufacture") Scene3D.buat(nama);
   }
+  // Green Power Plant: hentikan gambar 3D saat modulnya tidak dilihat (hemat CPU/GPU)
+  const gp = $("#gpFrame");
+  if (gp && gp.contentWindow) gp.contentWindow.postMessage(nama === "solar3d" ? "resume" : "pause", "*");
   if (typeof Scene3D !== "undefined") Scene3D.aktifkan(nama);   // beri tahu modul 3D mana yang harus digambar
   if (typeof ATG_UI !== "undefined") ATG_UI.setAktif(nama === "atg3d");
+}
+
+// Modul Solar Plant 3D → menampilkan aplikasi Green_Power_Plant/index.html di dalam bingkai
+function buatGreenPower() {
+  const m = $("#mod-solar3d");
+  m.innerHTML = `
+    <div class="gp-bar">
+      <div><b>🌿 Green Energy Solar Power Plant</b> <span class="gp-sim">SIMULATION</span>
+        <small>3D Renewable Energy Generation &amp; Distribution Management</small></div>
+      <div class="gp-aksi">
+        <button class="btn" id="gpFull">⛶ Layar penuh</button>
+        <a class="btn" href="Green_Power_Plant/index.html" target="_blank" rel="noopener">↗ Buka di tab baru</a>
+      </div>
+    </div>
+    <iframe id="gpFrame" class="gp-frame" src="Green_Power_Plant/index.html" title="Green Energy Solar Power Plant" allow="fullscreen"></iframe>`;
+  $("#gpFull").onclick = () => layarPenuh($("#gpFrame"));
 }
 
 // Layar penuh untuk elemen tertentu (atau seluruh halaman)
