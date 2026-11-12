@@ -103,7 +103,7 @@ const Wtp3D = (() => {
   }
 
   // Aliran: cincin-cincin bercahaya yang bergerak di sepanjang pipa
-  function aliran(induk, titik, warna, r) {
+  function aliran(induk, titik, warna, r, opsi = {}) {   // opsi.geo = bentuk lain (mis. bongkahan batubara), opsi.jarak = jarak antar benda
     const seg = []; let L = 0;
     for (let i = 0; i < titik.length - 1; i++) {
       const a = titik[i], b = titik[i + 1], len = a.distanceTo(b);
@@ -111,9 +111,9 @@ const Wtp3D = (() => {
       seg.push({ a, len, s0: L, arah: V().subVectors(b, a).normalize() }); L += len;
     }
     if (!seg.length) return { update() {}, mat: null, panjang: 0 };
-    const N = Math.max(3, Math.round(L / 2.2));
+    const N = Math.max(3, Math.round(L / (opsi.jarak || 2.2)));
     const mat = new THREE.MeshBasicMaterial({ color: warna, transparent: true, opacity: 0.95 });
-    const im = new THREE.InstancedMesh(new THREE.CylinderGeometry(r * 1.2, r * 1.2, 0.75, 10), mat, N);
+    const im = new THREE.InstancedMesh(opsi.geo || new THREE.CylinderGeometry(r * 1.2, r * 1.2, 0.75, 10), mat, N);
     im.frustumCulled = false; induk.add(im);
     const dm = new THREE.Object3D(), atas = V(0, 1, 0);
     let fase = Math.random();
@@ -370,7 +370,8 @@ const Wtp3D = (() => {
         F=Flow(hijau) P=Pressure(biru) L=Level(ungu) T=Temperature(oranye)
         A=Analyzer(toska) D=Differential pressure(cyan) S=Status pompa
      ====================================================== */
-  const WARNA_INST = { F: 0x16a34a, P: 0x2563eb, L: 0x7c3aed, T: 0xea580c, A: 0x0d9488, D: 0x0891b2, S: 0x22c55e };
+  const WARNA_INST = { F: 0x16a34a, P: 0x2563eb, L: 0x7c3aed, T: 0xea580c, A: 0x0d9488, D: 0x0891b2, S: 0x22c55e,
+    E: 0xf59e0b, X: 0x475569, V: 0xdb2777, Z: 0x9333ea, W: 0xca8a04 };   // E=Electrical, X=DCS/kalkulasi, V=Vibrasi, Z=Speed/Axial, W=Weigh feeder
   let texHalo = null;
   function instrumen(induk, tipe, x, y, z, opsi = {}) {
     const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = opsi.rotY || 0; induk.add(g);
@@ -378,7 +379,7 @@ const Wtp3D = (() => {
     const abu = bersama("instAbu", 0xd1d5db, { metalness: 0.4, roughness: 0.4 });
     const layar = bersama("instLayar", 0x0f172a, { emissive: 0x22d3ee, emissiveIntensity: 0.35 });
     let tinggiLabel = 1.4;
-    if (tipe === "A") {                                              // panel analyzer pada tiang
+    if (tipe === "A" || tipe === "E" || tipe === "X") {              // panel analyzer / meter listrik / layar DCS pada tiang
       if (opsi.tiang !== false) kotak(g, 0.12, y, 0.12, galv(), 0, -y, 0);
       kotak(g, 0.95, 1.1, 0.28, bersama("panelA", 0xf8fafc, { roughness: 0.5 }), 0, -0.55, 0);
       kotak(g, 0.95, 0.14, 0.3, warna, 0, 0.42, 0);

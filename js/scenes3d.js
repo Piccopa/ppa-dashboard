@@ -528,94 +528,9 @@ const Scene3D = (() => {
 
 
   /* ======================================================
-     MODUL D — POWER PLANT 3D (PLTU)
+     MODUL D — POWER PLANT 3D
+     Sekarang ada di file sendiri: js/pltu-scene.js (+ model di js/pltu3d.js)
      ====================================================== */
-  function scene_power3d() {
-    const U = { boiler: true, turbin: true, generator: true, ct: true, konveyor: true, trip: false, mw: 300 };
-    const unit = [["boiler", "🔥 Boiler"], ["turbin", "🌀 Turbin"], ["generator", "⚡ Generator"], ["ct", "☁️ Cooling Tower"], ["konveyor", "⛏️ Coal Conveyor"]];
-    const v = kerangka("power3d", {
-      judul: `⚡ Power Plant 3D – ${CONFIG.namaSingkat} Power Plant`,
-      bar: { t1: CONFIG.namaSingkat.toUpperCase(), t1s: "POWER PLANT", t2: "Digital Twin 3D – Pembangkit Listrik", t3: "Boiler · Turbin · Generator · Cooling Tower · Switchyard · CEMS" },
-      kiri: `<div class="v3-kv"><span>Daya Output</span><b data-k="mw">-</b></div><div class="v3-kv"><span>Efisiensi</span><b data-k="ef">-</b></div>
-        <div class="v3-kv"><span>Frekuensi</span><b data-k="hz">-</b></div><div class="v3-kv"><span>Batubara</span><b data-k="bb">-</b></div>
-        <div class="v3-kv"><span>Emisi SO₂ (CEMS)</span><b data-k="so2">-</b></div><div data-k="log" class="muted" style="font-size:10.5px;margin-top:6px"></div>`,
-      kanan: `<h5>▮ Kontrol Unit</h5>${unit.map(([k, n]) => `<div class="v3-row"><span>${n}</span><span class="toggle" data-tg="${k}"></span><button class="btn sm" data-sw="${k}"></button></div>`).join("")}`,
-      bawah: [
-        { label: "🌐 Overview", aksi: (v) => v.orbit.ke(v.preset.Overview) }, { label: "🔥 Boiler", aksi: (v) => v.orbit.ke(v.preset.Boiler) },
-        { label: "🌀 Turbin", aksi: (v) => v.orbit.ke(v.preset.Turbin) }, { label: "☁️ Cooling Tower", aksi: (v) => v.orbit.ke(v.preset.CT) },
-        { label: "🗼 Switchyard", aksi: (v) => v.orbit.ke(v.preset.SY) }, { label: "⛏️ Coal Yard", aksi: (v) => v.orbit.ke(v.preset.CY) },
-        { label: "🔄 Auto-Rotate", aksi: (v, b) => { v.orbit.auto = !v.orbit.auto; b.classList.toggle("active", v.orbit.auto); } },
-        { label: "🌙 Malam", aksi: (v, b) => { setMalam(v, !v.malam); b.innerHTML = v.malam ? "🌞 Siang" : "🌙 Malam"; } },
-        { label: "⚠ Simulasi Trip Unit", bahaya: true, aksi: () => { U.trip = !U.trip; toast(U.trip ? "UNIT TRIP – proteksi generator bekerja" : "Unit sinkron kembali ke jaringan"); } },
-      ],
-    });
-    dunia3D(v, 0xc7dfef);
-    v.langitSiang = 0xc7dfef;
-    const S = v.scene;
-    kotak(S, 700, 1, 700, 0xa9b89a, 0, -1, 0);
-    kotak(S, 200, 0.3, 150, 0xc9ccc4, 0, -0.2, 0);
-    kotak(S, 300, 0.3, 40, 0x3fa7d6, 0, 0.02, -110);
-    const boiler = kotak(S, 22, 42, 20, 0xe5e7eb, 0, 0, 0); kotak(S, 22.4, 3, 20.4, 0x1d4ed8, 0, 34, 0);
-    for (let i = 0; i < 8; i++) tabung(S, 3, 3.2, 10, i % 2 ? 0xffffff : 0xdc2626, 22, i * 10, -14, 16);
-    kotak(S, 44, 16, 18, 0xcbd5e1, -34, 0, 6); kotak(S, 44.2, 2, 18.2, 0x0ea5e9, -34, 13, 6);
-    const pts = []; for (let i = 0; i <= 10; i++) { const y = i * 4.6; pts.push(new THREE.Vector2(13 - Math.sin((i / 10) * Math.PI) * 4.5 - i * 0.25, y)); }
-    const ctGeo = new THREE.LatheGeometry(pts, 28);
-    const ctPos = [[45, 34], [78, 34]];
-    ctPos.forEach(([x, z]) => { const m = new THREE.Mesh(ctGeo, mat(0xd6d3d1, { side: THREE.DoubleSide })); m.position.set(x, 0, z); m.castShadow = true; S.add(m); });
-    // uap air dari cooling tower
-    const uap = [];
-    for (let i = 0; i < 40; i++) {
-      const m = new THREE.Mesh(new THREE.SphereGeometry(4, 8, 8), new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 }));
-      m.userData = { ct: i % 2, fase: Math.random() }; S.add(m); uap.push(m);
-    }
-    for (let i = 0; i < 5; i++) { const c = new THREE.Mesh(new THREE.ConeGeometry(10, 7, 8), mat(0x27272a)); c.position.set(-55 + i * 13, 3.5, -45); S.add(c); }
-    const konv = kotak(S, 60, 1.4, 2.5, 0x52525b, -25, 0, -25); konv.rotation.z = 0.2; konv.position.y = 8;
-    // switchyard & tower transmisi
-    for (let i = 0; i < 3; i++) kotak(S, 5, 5, 4, 0x6b7280, -70, 0, 40 + i * 8);
-    const towerT = [];
-    for (let i = 0; i < 4; i++) {
-      const x = -90 - i * 45, z = 48;
-      const m = new THREE.Mesh(new THREE.ConeGeometry(3, 34, 4), mat(0x94a3b8)); m.position.set(x, 17, z); S.add(m);
-      kotak(S, 16, 0.6, 0.6, 0x94a3b8, x, 28, z); towerT.push(new THREE.Vector3(x, 28, z));
-    }
-    const kabel = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-70, 5, 48), ...towerT]), new THREE.LineBasicMaterial({ color: 0x334155 }));
-    S.add(kabel);
-    for (let i = 0; i < 40; i++) pohon(S, rand(-150, 150), rand(80, 160), 1.2);
-    label(v, "Boiler", 0, 46, 0, () => (U.boiler && !U.trip ? "540 °C · 170 bar" : { t: "OFF", off: true }));
-    label(v, "Turbin", -40, 18, 6, () => (U.turbin && !U.trip ? "3.000 rpm" : { t: "STOP", off: true }));
-    label(v, "Generator", -24, 18, 6, () => (U.generator && !U.trip ? fmt(U.mw, 1) + " MW" : { t: "TRIP", off: true }));
-    label(v, "Cooling Tower", 61, 48, 34, () => (U.ct ? "ΔT 9,8 °C" : { t: "OFF", off: true }));
-    label(v, "Chimney / CEMS", 22, 84, -14, () => "SO₂ " + fmt(rand(180, 200)) + " mg/Nm³");
-    label(v, "Switchyard 150 kV", -70, 8, 48, () => (U.trip ? { t: "Open", off: true } : "Closed"));
-    label(v, "Coal Yard", -30, 10, -45, () => fmt(38500) + " t");
-    v.preset = { Overview: [2.0, 1.0, 250, [-10, 10, 0]], Boiler: [0.6, 1.1, 90, [0, 20, 0]], Turbin: [1.3, 1.0, 80, [-34, 6, 6]], CT: [0.9, 1.0, 120, [60, 15, 34]], SY: [1.8, 1.0, 120, [-100, 10, 48]], CY: [2.6, 0.9, 90, [-30, 0, -40]] };
-    v.orbit.ke(v.preset.Overview);
-    const renderKontrol = () => {
-      v.el.querySelectorAll("[data-tg]").forEach((e) => { const on = U[e.dataset.tg] && !U.trip; e.textContent = on ? "ON" : "OFF"; e.classList.toggle("off", !on); });
-      v.el.querySelectorAll("[data-sw]").forEach((b) => { const on = U[b.dataset.sw]; b.textContent = on ? "■ Stop" : "▶ Start"; b.className = "btn sm " + (on ? "red" : ""); });
-    };
-    v.el.querySelectorAll("[data-sw]").forEach((b) => (b.onclick = () => { U[b.dataset.sw] = !U[b.dataset.sw]; renderKontrol(); }));
-    renderKontrol();
-    v.updaters.push((t) => {
-      uap.forEach((m) => {
-        const f = ((t / 6000 + m.userData.fase) % 1), [x, z] = ctPos[m.userData.ct];
-        m.visible = U.ct;
-        m.position.set(x + f * 10, 46 + f * 40, z + Math.sin(f * 6 + m.userData.fase * 9) * 3);
-        m.scale.setScalar(1 + f * 2.5); m.material.opacity = 0.55 * (1 - f);
-      });
-      boiler.material.emissive = new THREE.Color(U.trip && Math.sin(t / 150) > 0 ? 0x7f1d1d : 0x000000);
-    });
-    v.detik = () => {
-      renderKontrol();
-      const jalan = U.boiler && U.turbin && U.generator && !U.trip;
-      U.mw = jalan ? 300 + rand(-4, 4) : Math.max(0, U.mw * 0.4);
-      const set = (k, t) => (v.el.querySelector(`[data-k="${k}"]`).textContent = t);
-      set("mw", fmt(U.mw, 1) + " MW"); set("ef", jalan ? fmt(38.2 + rand(-0.2, 0.2), 1) + " %" : "0 %");
-      set("hz", jalan ? fmt(50 + rand(-0.03, 0.03), 2) + " Hz" : "0 Hz"); set("bb", U.konveyor && jalan ? fmt(142 + rand(-2, 2)) + " t/jam" : "0 t/jam");
-      set("so2", fmt(rand(180, 200)) + " mg/Nm³"); set("log", `${jam()} ${U.trip ? "⚠ Unit trip – investigasi proteksi" : "Operasi normal · sinkron jaringan"}`);
-    };
-    return v;
-  }
 
   /* ======================================================
      MODUL E — WATER TREATMENT 3D
@@ -709,7 +624,7 @@ const Scene3D = (() => {
     return v;
   }
 
-  const pembuat = { twin3d: scene_twin3d, palm3d: scene_palm3d, power3d: scene_power3d, solar3d: scene_solar3d };
+  const pembuat = { twin3d: scene_twin3d, palm3d: scene_palm3d, solar3d: scene_solar3d };
 
   /* ---------- Loop animasi (menggambar ulang ±60x per detik) ---------- */
   function loop(t) {
