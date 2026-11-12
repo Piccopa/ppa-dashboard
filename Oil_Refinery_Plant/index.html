@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Oil Refinery Plant – SCADA & Process Monitoring</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/rf.css" />
+</head>
+<body>
+  <!-- ================= HEADER ================= -->
+  <header class="hdr">
+    <button id="menuBtn" class="btn ikon" title="Menu">☰</button>
+    <div class="brand">
+      <svg viewBox="0 0 64 64" class="logo" aria-hidden="true">
+        <rect x="8" y="22" width="9" height="36" rx="2" fill="#94a3b8"/><rect x="22" y="12" width="8" height="46" rx="2" fill="#cbd5e1"/>
+        <path d="M44 4 C48 12 54 14 50 22 C48 26 40 26 40 20 C40 15 44 12 44 4 Z" fill="#f97316"/><path d="M45 12 C47 16 49 18 47 21 C46 23 43 23 43 20 C43 18 45 16 45 12 Z" fill="#fde047"/>
+        <rect x="42" y="24" width="5" height="34" fill="#64748b"/><ellipse cx="34" cy="58" rx="28" ry="3" fill="#f59e0b" opacity=".6"/>
+      </svg>
+      <div><h1>3D OIL REFINERY PLANT MONITORING SYSTEM</h1><p>INDUSTRIAL SCADA / DCS PROCESS MONITORING</p></div>
+    </div>
+    <div class="hdr-r">
+      <span class="sim-badge" title="Semua nilai adalah data simulasi, bukan pengukuran nyata">● SIMULATION</span>
+      <span class="mode-badge" id="hdrMode">–</span>
+      <div class="clock"><small>SIM TIME</small><b id="simJam">--:--:--</b><span id="simTgl"></span></div>
+      <label class="spd"><small>SPEED</small><select id="speed"><option value="1">1× (real)</option><option value="10">10×</option><option value="60">60×</option><option value="300">300×</option></select></label>
+      <div class="clock real"><small>LOCAL</small><b id="realJam">--:--:--</b></div>
+      <button id="almBtn" class="alm-sum" title="Alarm aktif"><span class="c-crit" id="ac_crit">0</span><span class="c-warn" id="ac_warn">0</span><span class="c-comm" id="ac_comm">0</span></button>
+    </div>
+  </header>
+
+  <!-- ================= MENU + HALAMAN ================= -->
+  <div class="wrap">
+    <nav id="nav"></nav>
+    <main id="main"></main>
+  </div>
+
+  <!-- ================= BANNER ALARM & MODAL ================= -->
+  <footer class="alm-banner" id="banner"></footer>
+  <div id="modal"></div>
+
+  <!-- Library (butuh internet saat dibuka) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Kode aplikasi (urutan penting) -->
+  <script src="js/config.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/sim.js"></script>
+  <script src="js/datasource.js"></script>
+  <script src="js/alarms.js"></script>
+  <script src="js/scene3d.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/logger.js"></script>
+  <script src="js/pages.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

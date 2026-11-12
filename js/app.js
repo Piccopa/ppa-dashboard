@@ -42,11 +42,14 @@ function bukaModul(nama) {
     if (nama === "tower") buatSmartTower();
     else if (nama === "atg3d") ATG_UI.buka();                     // halaman 3D Automatic Tank Gauge
     else if (nama === "solar3d") buatGreenPower();                // aplikasi Green Power Plant (iframe)
+    else if (nama === "refinery3d") buatRefinery();               // aplikasi Oil Refinery Plant (iframe)
     else if (nama !== "manufacture") Scene3D.buat(nama);
   }
   // Green Power Plant: hentikan gambar 3D saat modulnya tidak dilihat (hemat CPU/GPU)
   const gp = $("#gpFrame");
   if (gp && gp.contentWindow) gp.contentWindow.postMessage(nama === "solar3d" ? "resume" : "pause", "*");
+  const rf = $("#rfFrame");
+  if (rf && rf.contentWindow) rf.contentWindow.postMessage(nama === "refinery3d" ? "resume" : "pause", "*");
   if (typeof Scene3D !== "undefined") Scene3D.aktifkan(nama);   // beri tahu modul 3D mana yang harus digambar
   if (typeof ATG_UI !== "undefined") ATG_UI.setAktif(nama === "atg3d");
 }
@@ -65,6 +68,22 @@ function buatGreenPower() {
     </div>
     <iframe id="gpFrame" class="gp-frame" src="Green_Power_Plant/index.html" title="Green Energy Solar Power Plant" allow="fullscreen"></iframe>`;
   $("#gpFull").onclick = () => layarPenuh($("#gpFrame"));
+}
+
+// Modul Oil Refinery 3D → menampilkan aplikasi Oil_Refinery_Plant/index.html di dalam bingkai
+function buatRefinery() {
+  const m = $("#mod-refinery3d");
+  m.innerHTML = `
+    <div class="gp-bar rf-bar">
+      <div><b>🛢 3D Oil Refinery Plant</b> <span class="gp-sim">SIMULATION</span>
+        <small>Industrial SCADA / DCS process monitoring · api flare & asap cerobong animasi</small></div>
+      <div class="gp-aksi">
+        <button class="btn" id="rfFull">⛶ Layar penuh</button>
+        <a class="btn" href="Oil_Refinery_Plant/index.html" target="_blank" rel="noopener">↗ Buka di tab baru</a>
+      </div>
+    </div>
+    <iframe id="rfFrame" class="gp-frame" src="Oil_Refinery_Plant/index.html" title="3D Oil Refinery Plant" allow="fullscreen"></iframe>`;
+  $("#rfFull").onclick = () => layarPenuh($("#rfFrame"));
 }
 
 // Layar penuh untuk elemen tertentu (atau seluruh halaman)

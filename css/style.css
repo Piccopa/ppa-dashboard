@@ -363,4 +363,5 @@ canvas.trend { width: 100%; height: 190px; display: block; }
 .gp-sim { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .5px; background: #facc15; color: #1f2937; }
 .gp-aksi { display: flex; gap: 8px; }
 .gp-aksi a.btn { text-decoration: none; display: inline-flex; align-items: center; }
-.gp-frame { display: block; width: 100%; height: calc(100vh - var(--header-h, 90px) - 110px); min-height: 640px; border: 1px solid rgba(34,197,94,.35); border-radius: 12px; background: #07110c; }
+.gp-frame { display: block; width: 100%; height: calc(100vh - var(--header-h, 90px) - 110px); min-height: 760px; border: 1px solid rgba(34,197,94,.35); border-radius: 12px; background: #07110c; }
+.gp-bar.rf-bar { background: linear-gradient(90deg, rgba(180,83,9,.28), rgba(30,41,59,.25)); border-color: rgba(245,158,11,.4); }

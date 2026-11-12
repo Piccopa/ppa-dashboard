@@ -1,0 +1,44 @@
+3D OIL REFINERY PLANT – INDUSTRIAL SCADA & PROCESS MONITORING SYSTEM
+=====================================================================
+
+SEMUA DATA DI APLIKASI INI ADALAH SIMULASI (SIMULATION), BUKAN PENGUKURAN ASLI.
+
+CARA MENJALANKAN DI XAMPP
+1. Salin folder "Oil_Refinery_Plant" ke:  C:\xampp\htdocs\Oil_Refinery_Plant\
+2. Jalankan Apache dari XAMPP Control Panel.
+3. Buka browser:  http://localhost/Oil_Refinery_Plant/
+Komputer harus tersambung internet (Three.js & Chart.js diambil dari CDN).
+
+ANIMASI 3D
+- Api flare (FL-901): bergoyang, partikel api, cahaya oranye (terang di malam hari).
+  Besar api mengikuti laju gas flare FT-901 – coba "PSV relief → flaring" di menu Alarm.
+- Asap: keluar dari semua cerobong KECUALI flare: furnace CDU (H-101), VDU (H-201),
+  HDT (H-301), Reformer (H-801), cerobong FCC, incinerator SRU, hydrogen plant (SMR),
+  boiler A & B. Asap mengikuti arah & kecepatan angin simulasi (WD/WS-1161) dan
+  berhenti bila unit/furnace mati. Cooling tower mengeluarkan uap air tipis.
+
+17 MENU
+ 1 Refinery Overview      7 FCC (opsional)          13 Electrical
+ 2 3D Plant Visualization 8 Storage Tank Farm       14 Flare, Environment & Safety
+ 3 CDU                    9 Pumps & Compressors     15 Trend (RT/1h/24h/harian/mingguan/bulanan/tahunan)
+ 4 VDU                   10 Boiler & Steam          16 Alarm & Event (+ simulasi gangguan)
+ 5 Hydrotreating         11 Cooling Water           17 Historical Data Logger (CSV / Excel)
+ 6 Catalytic Reforming   12 Utilities
+
+ISI FOLDER
+  index.html          halaman utama
+  css/rf.css          tampilan
+  js/config.js        kapasitas kilang, yield, tangki, pompa, kompresor, batas emisi,
+                      warna pipa, DAFTAR TAG INSTRUMEN (± 313 tag) – ubah di sini
+  js/sim.js           mesin simulasi proses
+  js/alarms.js        alarm LL/L/H/HH otomatis + alarm peralatan (ISA-18.2)
+  js/scene3d.js       kilang 3D, api flare, asap cerobong
+  js/pages.js         isi 17 menu
+  js/charts.js        grafik tren
+  js/logger.js        data logger & ekspor
+  js/datasource.js    titik sambung untuk data asli (OPC UA / Modbus / DCS / PLC)
+  js/app.js           navigasi & tombol
+
+DATA TERSIMPAN
+Riwayat disimpan di browser (localStorage, awalan "rf-"). Tombol "Reset simulasi"
+di menu Data Logger menghapus dan membuat ulang data simulasi.
