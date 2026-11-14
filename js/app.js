@@ -43,6 +43,7 @@ function bukaModul(nama) {
     else if (nama === "atg3d") ATG_UI.buka();                     // halaman 3D Automatic Tank Gauge
     else if (nama === "solar3d") buatGreenPower();                // aplikasi Green Power Plant (iframe)
     else if (nama === "refinery3d") buatRefinery();               // aplikasi Oil Refinery Plant (iframe)
+    else if (nama === "coalsilo3d") buatCoalSilo();               // aplikasi Coal Silo Monitoring (iframe)
     else if (nama !== "manufacture") Scene3D.buat(nama);
   }
   // Green Power Plant: hentikan gambar 3D saat modulnya tidak dilihat (hemat CPU/GPU)
@@ -50,6 +51,8 @@ function bukaModul(nama) {
   if (gp && gp.contentWindow) gp.contentWindow.postMessage(nama === "solar3d" ? "resume" : "pause", "*");
   const rf = $("#rfFrame");
   if (rf && rf.contentWindow) rf.contentWindow.postMessage(nama === "refinery3d" ? "resume" : "pause", "*");
+  const cs = $("#csFrame");
+  if (cs && cs.contentWindow) cs.contentWindow.postMessage(nama === "coalsilo3d" ? "resume" : "pause", "*");
   if (typeof Scene3D !== "undefined") Scene3D.aktifkan(nama);   // beri tahu modul 3D mana yang harus digambar
   if (typeof ATG_UI !== "undefined") ATG_UI.setAktif(nama === "atg3d");
 }
@@ -84,6 +87,21 @@ function buatRefinery() {
     </div>
     <iframe id="rfFrame" class="gp-frame" src="Oil_Refinery_Plant/index.html" title="3D Oil Refinery Plant" allow="fullscreen"></iframe>`;
   $("#rfFull").onclick = () => layarPenuh($("#rfFrame"));
+}
+
+function buatCoalSilo() {
+  const m = $("#mod-coalsilo3d");
+  m.innerHTML = `
+    <div class="gp-bar cs-bar">
+      <div><b>⛏ 3D Coal Silo Monitoring</b> <span class="gp-sim">SIMULATION</span>
+        <small>4 silo batu bara · kontur material 3D · instrumen · peralatan · alarm · data logger</small></div>
+      <div class="gp-aksi">
+        <button class="btn" id="csFull">⛶ Layar penuh</button>
+        <a class="btn" href="Coal_Silo_Monitoring/index.html" target="_blank" rel="noopener">↗ Buka di tab baru</a>
+      </div>
+    </div>
+    <iframe id="csFrame" class="gp-frame" src="Coal_Silo_Monitoring/index.html" title="3D Coal Silo Monitoring" allow="fullscreen"></iframe>`;
+  $("#csFull").onclick = () => layarPenuh($("#csFrame"));
 }
 
 // Layar penuh untuk elemen tertentu (atau seluruh halaman)

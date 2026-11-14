@@ -1,0 +1,53 @@
+SMART INDUSTRIAL PLANT – 3D COAL SILO MONITORING SYSTEM
+=======================================================
+SEMUA DATA DI APLIKASI INI ADALAH SIMULATION (bukan pengukuran lapangan).
+
+1. CARA MEMBUKA
+   a) Paling mudah: klik dua kali index.html (butuh internet untuk Three.js & Chart.js).
+   b) Dengan XAMPP:
+      - Salin folder "Coal_Silo_Monitoring" ke  C:\xampp\htdocs\
+      - Jalankan XAMPP Control Panel → Start "Apache"
+      - Buka browser: http://localhost/Coal_Silo_Monitoring/
+   c) Di dalam dashboard MITMAG: menu chip "⛏ Coal Silo 3D".
+
+2. ISI FOLDER
+   index.html          halaman utama
+   css/cs.css          tampilan (navy gelap + cyan)
+   js/config.js        PENGATURAN: geometri silo, kapasitas, data contoh, batas alarm, tag
+   js/util.js          fungsi bantu (format angka, ekspor CSV/Excel)
+   js/surface.js       mesin kontur permukaan material (grid 41x41, statistik, point cloud)
+   js/sim.js           simulasi: filling, discharge, instrumen, peralatan, histori 7 hari
+   js/alarms.js        alarm & event (ISA-18.2) + status silo
+   js/comm.js          adapter komunikasi + peta register Haiwell PLC
+   js/scene3d.js       3D plant (4 silo) + tampilan 3D surface kontur
+   js/views2d.js       peta topografi 2D, cross section, heatmap
+   js/charts.js        trend (real time, 1 jam, 8 jam, 24 jam, 7 hari, custom)
+   js/logger.js        data logger + report
+   js/pages.js         11 halaman menu
+   js/app.js           navigasi, tombol START/STOP/RESET/AUTO/MANUAL, modal detail
+   api/realtime.php    CONTOH endpoint gateway untuk XAMPP (masih data contoh)
+
+3. MENGUBAH DATA CONTOH  (js/config.js → bagian "silo")
+   ["SILO-01", "COAL SILO-01", 623.2, [36.8, 38.4, 40.3, 41.0]]
+     = kode, nama, berat awal (ton), suhu awal 4 sensor (°C)
+   Kapasitas 800 t, densitas 0,80 t/m³, diameter 7 m.
+
+   CATATAN KONSISTENSI: 623,2 t ÷ 800 t = 77,9 % (bukan 78,5 %).
+   Level %, volume dan berat dihitung dari satu sumber (massa) agar selalu konsisten.
+
+4. KONTUR MATERIAL
+   - Kontur 3D hanya bisa dari 3D LEVEL SCANNER (point cloud). Radar biasa = 1 titik.
+   - Halaman "Material Contour Mapping" → "Import point cloud" menerima CSV/JSON x,y,z (meter).
+     x = timur, y = utara dari sumbu silo, z = tinggi dari outlet hopper.
+   - Tombol "Sample CSV" mengunduh contoh format.
+
+5. INTEGRASI LAPANGAN (nanti)
+   Field → PLC/RIO → Haiwell PLC → Modbus TCP/RTU / OPC UA / MQTT → SCADA/gateway → MySQL → web.
+   Browser tidak bisa membaca Modbus langsung; gunakan gateway (Haiwell Cloud SCADA, Node-RED,
+   atau PHP) yang mengeluarkan JSON. Format JSON & peta register ada di menu "System Settings".
+   Haiwell: nilai REAL = 2 register (urutan word CD AB). Alamat Modbus 0-based = 512 + V,
+   HMI pihak ketiga 1-based = 40513 + V (contoh V100 → 40613). Sesuaikan dengan program PLC Anda.
+
+6. RESET
+   Tombol RESET = kembali ke data contoh. Menu System Settings → "Clear history & restart"
+   menghapus semua histori di browser (localStorage, awalan "cs-").
