@@ -7,15 +7,15 @@
 const CONFIG = {
   // ---- Identitas perusahaan ----
   namaSistem: "MITMAG SMART MONITORING SYSTEM",
-  subJudul: "Digital Twin Smart Manufacture 4.0 · Provide by PT MITMAG",
-  namaPerusahaan: "PT MITMAG",
+  subJudul: "Digital Twin Smart Manufacture 4.0 · Provide by PT PICCO PRIMA ARTHA",
+  namaPerusahaan: "PT PICCO PRIMA ARTHA",
   namaSingkat: "MITMAG",
 
   // ---- Kontak di footer (GANTI dengan data asli Anda) ----
-  telepon: "+62 000-0000-0000",
-  email: "email@perusahaan-anda.com",
-  website: "www.website-anda.com",
-  namaPembuat: "Nama Anda",
+  telepon: "+62851-1138-3882",
+  email: "sales@piccopa.co.id",
+  website: "www.piccopa.co.id",
+  namaPembuat: "Hage Sances Siregar",
 };
 
 /* ---- Daftar peralatan di "Kontrol Peralatan" ----
@@ -66,7 +66,7 @@ const LIVE = {
   user: "",                                              // broker publik: tanpa user
   pass: "",
   topik: "ppa-2ypayn1eol/pm01/data",                     // sama dengan ppa-bridge/config.php
-  batasOffline: 30,                                      // detik tanpa data → OFFLINE
+  batasOffline: 10,                                      // detik tanpa data → OFFLINE
   nama: "Power Meter PM-01",
   // nilai yang ditampilkan: [nama kolom database / kunci JSON, label, satuan, desimal]
   // Kolom tabel MySQL "powermeter" dari HMI Haiwell: Tegangan, Frequency.
@@ -83,11 +83,12 @@ const LIVE = {
 /* ---- Pintu akses kontrol & karyawan ---- */
 const PINTU = ["Pintu Utama", "Pintu Kantor 1", "Lantai Pabrik", "Gudang", "Ruang Server"];
 const KARYAWAN = [
-  { nama: "Budi Santoso", id: "EMP-001" },
-  { nama: "Sari Wulandari", id: "EMP-014" },
-  { nama: "Dimas Pratama", id: "EMP-027" },
-  { nama: "Rina Anggraini", id: "EMP-033" },
-  { nama: "Agus Hidayat", id: "EMP-041" },
+  { nama: "Indra Wahyudi", id: "EMP-001" },
+  { nama: "Ika Erlia", id: "EMP-014" },
+  { nama: "Deareisa", id: "EMP-027" },
+  { nama: "Hartono Sinaga", id: "EMP-033" },
+  { nama: "Demak Parulian", id: "EMP-041" },
+  { nama: "Winda Sinaga", id: "EMP-045" },
 ];
 
 /* ---- Zona fire alarm ---- */
@@ -98,14 +99,14 @@ const KAMERA = ["Lantai Pabrik 1", "Lantai Pabrik 2", "Upper Mezzanine", "Ruang 
 
 /* ---- Tenant gedung (modul Smart Tower) ---- */
 const TENANT = [
-  { kode: "T-01", lantai: "Lt.2", nama: "PT Samudra Boga", bidang: "F&B", luas: 120 },
-  { kode: "T-02", lantai: "Lt.3", nama: "CV Cakra Konsultan", bidang: "Konsultan", luas: 90 },
-  { kode: "T-03", lantai: "Lt.4", nama: "PT Nusa Teknologi", bidang: "IT", luas: 150 },
-  { kode: "T-04", lantai: "Lt.5", nama: "PT Bahari Logistik", bidang: "Logistik", luas: 180 },
-  { kode: "T-05", lantai: "Lt.6", nama: "PT Citra Farma", bidang: "Farmasi", luas: 110 },
+  { kode: "T-01", lantai: "Lt.2", nama: "PT Hartono Travel", bidang: "Travel", luas: 120 },
+  { kode: "T-02", lantai: "Lt.3", nama: "CV Sinaga Production", bidang: "Konsultan", luas: 90 },
+  { kode: "T-03", lantai: "Lt.4", nama: "PT Indra Wahyudi Digital", bidang: "IT", luas: 150 },
+  { kode: "T-04", lantai: "Lt.5", nama: "PT Parulian Sihombing Keyboard", bidang: "Music", luas: 180 },
+  { kode: "T-05", lantai: "Lt.6", nama: "PT Fikki Farmasi Jaya", bidang: "Farmasi", luas: 110 },
   { kode: "T-06", lantai: "Lt.7", nama: "Kantor Hukum Pratama", bidang: "Hukum", luas: 85 },
   { kode: "T-07", lantai: "Lt.8", nama: "PT Medika Prima", bidang: "Klinik", luas: 200 },
-  { kode: "T-08", lantai: "Lt.9", nama: "PT Garuda Digital", bidang: "Digital", luas: 160 },
-  { kode: "T-09", lantai: "Lt.10", nama: "CV Tirta Kreatif", bidang: "Kreatif", luas: 95 },
+  { kode: "T-08", lantai: "Lt.9", nama: "PT Damai Coleection", bidang: "Digital", luas: 160 },
+  { kode: "T-09", lantai: "Lt.10", nama: "Amarissa Tringthing", bidang: "Monza", luas: 95 },
   { kode: "T-10", lantai: "Lt.11", nama: "PT Sumber Energi", bidang: "Energi", luas: 220 },
 ];
