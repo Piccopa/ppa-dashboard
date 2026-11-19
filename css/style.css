@@ -367,3 +367,27 @@ canvas.trend { width: 100%; height: 190px; display: block; }
 .gp-bar.rf-bar { background: linear-gradient(90deg, rgba(180,83,9,.28), rgba(30,41,59,.25)); border-color: rgba(245,158,11,.4); }
 
 .gp-bar.cs-bar { border-color: #0e7490; background: linear-gradient(90deg, rgba(14,116,144,.25), rgba(10,20,40,.6)); }
+
+/* ---- Data alat asli (LIVE) ---- */
+.live-panel { border-color: #16a34a; box-shadow: 0 0 0 1px rgba(34,197,94,.25); }
+.live-panel.basi { border-color: #dc2626; box-shadow: 0 0 0 1px rgba(220,38,38,.3); }
+.live-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.live-item { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+.live-item .label { font-size: 11px; color: var(--muted); }
+.live-item .value { font-size: 22px; font-weight: 800; font-family: "Share Tech Mono", monospace; }
+.live-item .value small { font-size: 11px; font-weight: 500; color: var(--muted); }
+.live-panel.basi .live-item .value { color: var(--muted); }
+.live-info { font-size: 11px; color: var(--muted); margin-top: 8px; }
+.rt.live { border-color: #16a34a; }
+.rt.live .label::after { content: " · LIVE"; color: #22c55e; font-weight: 800; }
+@media (max-width: 900px) { .live-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.rt.live-off { border-color: #dc2626; } .rt.live-off .value span { color: #f87171; font-size: 13px; }
+.rt.live-off .label::after { content: " · LIVE"; color: #f87171; font-weight: 800; }
+.live-alarm { display: none; background: #7f1d1d; border: 1px solid #ef4444; color: #fecaca; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; animation: liveKedip 1.4s infinite; }
+.live-alarm b { display: block; font-size: 20px; color: #fff; letter-spacing: 1px; }
+.live-alarm span { display: block; font-size: 13px; margin-top: 2px; }
+.live-alarm small { display: block; font-size: 11px; opacity: .8; margin-top: 4px; }
+.live-panel.basi .live-item .value span { color: #f87171; text-decoration: line-through; text-decoration-thickness: 1px; }
+#btnIntegrasi.chip-offline { background: #991b1b; border-color: #ef4444; color: #fff; animation: liveKedip 1.4s infinite; }
+#btnIntegrasi.chip-online { border-color: #16a34a; color: #86efac; }
+@keyframes liveKedip { 50% { opacity: .65; } }

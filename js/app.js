@@ -185,6 +185,7 @@ function buatSmartManufacture() {
     </div>
   </div>
 
+  ${typeof livePanelHTML === "function" ? livePanelHTML() : ""}
   <!-- MONITORING REAL-TIME -->
   <div class="panel" id="realtime" style="margin-bottom:12px">
     <div class="panel-head"><div class="panel-title">Monitoring Real-Time</div><b class="muted">Pembaruan tiap 1 detik</b></div>
@@ -509,17 +510,25 @@ function tickManufacture() {
   SENSOR.forEach((s) => {
     let v = state.sensor[s.id] + rand(-s.acak, s.acak);
     v = Math.max(s.nilai - s.acak * 4, Math.min(s.nilai + s.acak * 4, v));
-    const alatMati = Object.entries(ALAT_SENSOR).find(([a, sid]) => sid === s.id && !state.alat[a]);
+    // data asli dari power meter (bila LIVE aktif & segar) menggantikan simulasi
+    const kunciLive = typeof LIVE !== "undefined" && LIVE.aktif && LIVE.ganti ? LIVE.ganti[s.id] : null;
+    const nilaiLive = kunciLive && typeof liveNilai === "function" ? liveNilai(kunciLive) : null;
+    if (nilaiLive !== null) v = nilaiLive;
+    const alatMati = nilaiLive === null && Object.entries(ALAT_SENSOR).find(([a, sid]) => sid === s.id && !state.alat[a]);
     state.sensor[s.id] = v;
     const tampil = alatMati ? 0 : v;
     state.riwayat[s.id].push(tampil); state.riwayat[s.id].shift();
     const kartu = $("#rt-" + s.id);
-    const waspada = s.bawah ? tampil < s.batas * 1.02 : tampil > s.batas * 0.98;
+    const waspada = nilaiLive === null && (s.bawah ? tampil < s.batas * 1.02 : tampil > s.batas * 0.98);
     kartu.classList.toggle("warn", waspada && !alatMati);
+    kartu.classList.toggle("live", nilaiLive !== null);
     kartu.querySelector(".value span").textContent = fmt(tampil, s.desimal);
+    if (kunciLive && nilaiLive === null) kartu.querySelector(".value span").textContent = "OFFLINE";   // alat asli tidak mengirim data → jangan tampilkan simulasi
+    kartu.classList.toggle("live-off", !!kunciLive && nilaiLive === null);
     kartu.querySelector(".spark").innerHTML = sparkline(state.riwayat[s.id]);
-    if (!alatMati && Math.random() < 0.15) catatAnomali(s, v, false);
+    if (!alatMati && nilaiLive === null && Math.random() < 0.15) catatAnomali(s, v, false);
   });
+  if (typeof liveUpdate === "function") liveUpdate();
   const S = state.sensor, on = state.alat;
 
   // 2. ringkasan
@@ -605,7 +614,9 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   try { if (localStorage.getItem("tema") === "light") document.body.classList.add("light"); } catch (e) {}
   $("#btnFull").onclick = () => layarPenuh();
-  $("#btnIntegrasi").onclick = () => toast("Mode integrasi: Simulasi — data dibuat otomatis. Lihat panduan untuk sensor asli.");
+  $("#btnIntegrasi").onclick = () => toast(typeof LIVE !== "undefined" && LIVE.aktif
+    ? `Mode integrasi: LIVE (MQTT) — ${LIVE.nama}: ${liveStatusTeks()}${LIVE_DATA.err ? " · " + LIVE_DATA.err : ""}`
+    : "Mode integrasi: Simulasi — data dibuat otomatis. Aktifkan LIVE di js/config.js untuk alat asli.");
   $("#search").addEventListener("keydown", (e) => { if (e.key === "Enter") cari(e.target.value); });
 
   // Ukur tinggi header agar menu samping selalu pas di bawahnya (berapa pun ukuran logo)

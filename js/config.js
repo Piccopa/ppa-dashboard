@@ -55,6 +55,31 @@ const SENSOR = [
   { id: "aki", nama: "Baterai/Aki", nilai: 53.8, satuan: "V", acak: 0.4, desimal: 1, batas: 54.5 },
 ];
 
+/* =========================================================
+   INTEGRASI ALAT ASLI (LIVE) – POWER METER lewat MQTT
+   Langkah: isi alamat broker HiveMQ Cloud + user KHUSUS WEBSITE
+   (permission "Subscribe only"), lalu ubah aktif: true.
+   ========================================================= */
+const LIVE = {
+  aktif: true,                                           // true = pakai data asli
+  url: "wss://broker.hivemq.com:8884/mqtt",              // broker publik HiveMQ (wss wajib karena website https)
+  user: "",                                              // broker publik: tanpa user
+  pass: "",
+  topik: "ppa-2ypayn1eol/pm01/data",                     // sama dengan ppa-bridge/config.php
+  batasOffline: 30,                                      // detik tanpa data → OFFLINE
+  nama: "Power Meter PM-01",
+  // nilai yang ditampilkan: [nama kolom database / kunci JSON, label, satuan, desimal]
+  // Kolom tabel MySQL "powermeter" dari HMI Haiwell: Tegangan, Frequency.
+  // Bila nanti menambah kolom di history group HMI (mis. Arus, Daya, Energi), tambahkan barisnya di sini.
+  titik: [
+    ["Tegangan", "Tegangan", "V", 1],
+    ["Frequency", "Frekuensi", "Hz", 2],
+  ],
+  // kartu "Monitoring Real-Time" yang diganti data asli: id sensor → kunci JSON
+  // contoh bila sudah ada kolom energi: ganti: { power: "Energi" },
+  ganti: {},
+};
+
 /* ---- Pintu akses kontrol & karyawan ---- */
 const PINTU = ["Pintu Utama", "Pintu Kantor 1", "Lantai Pabrik", "Gudang", "Ruang Server"];
 const KARYAWAN = [
